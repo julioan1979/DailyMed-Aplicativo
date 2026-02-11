@@ -30,7 +30,14 @@
 body { font-family: system-ui, -apple-system, sans-serif; }
 .card-round { border-radius: 14px; }
 .btn-round { border-radius: 10px; }
-.input-outline { border: 1px solid var(--outline); border-radius: 8px; }
+.input-outline { border: 1px solid var(--outline); border-radius: 10px; transition: border-color 0.15s, box-shadow 0.15s; }
+.input-outline:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(148, 130, 189, 0.2); }
+.med-form-section { background: var(--primary-container); border-radius: 1rem; padding: 1.25rem; margin-bottom: 1rem; border: 1px solid rgba(148, 130, 189, 0.2); }
+.med-form-section-title { font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+.med-form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem; }
+.med-form-submit { width: 100%; padding: 0.875rem 1rem; background: var(--primary); color: var(--on-primary); font-weight: 600; border-radius: 12px; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: filter 0.15s; }
+.med-form-submit:hover { filter: brightness(1.05); }
+.med-form-submit:active { filter: brightness(0.98); }
 
 /* Autocomplete dropdown */
 .autocomplete-list { max-height: 240px; overflow-y: auto; }

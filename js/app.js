@@ -8,11 +8,11 @@ const CATEGORIAS = [
 ];
 
 const PERIODOS = [
-  { id: 'pequeno_almoco', label: 'Pequeno-almoço', times: ['07:30', '08:00', '09:00'] },
-  { id: 'almoco', label: 'Almoço', times: ['12:30', '13:00', '13:30'] },
-  { id: 'lanche', label: 'Lanche', times: ['16:00', '16:30', '17:00'] },
-  { id: 'jantar', label: 'Jantar', times: ['19:30', '20:00', '20:30'] },
-  { id: 'ceia', label: 'Ceia', times: ['22:00', '22:30', '23:00'] },
+  { id: 'pequeno_almoco', label: 'Pequeno-almoço', start: '06:00', end: '10:00', icon: 'free_breakfast' },
+  { id: 'almoco', label: 'Almoço', start: '12:00', end: '14:00', icon: 'restaurant' },
+  { id: 'lanche', label: 'Lanche', start: '16:00', end: '17:30', icon: 'coffee' },
+  { id: 'jantar', label: 'Jantar', start: '19:00', end: '21:00', icon: 'dinner_dining' },
+  { id: 'ceia', label: 'Ceia', start: '22:00', end: '23:30', icon: 'nightlight_round' },
 ];
 
 const RECYCLING_LEVELS = [
@@ -80,6 +80,15 @@ function formatDateYMD(dateStr) {
   const d = dateStr.split('-');
   if (d.length !== 3) return dateStr;
   return d[2] + '/' + d[1] + '/' + d[0];
+}
+
+function cleanNotesFromLegacy(notes) {
+  if (!notes || typeof notes !== 'string') return notes || '';
+  return notes
+    .replace(/\s*Posologia:\s*---\.?\s*Indicação:\s*---\.?\s*/gi, '')
+    .replace(/\s*Indicação:\s*---\.?\s*/gi, '')
+    .replace(/\s*Posologia:\s*---\.?\s*/gi, '')
+    .trim();
 }
 
 function getValidityStatus(expiryDate) {
@@ -210,25 +219,55 @@ function viewMedicacaoArmario(params) {
   if (filter === 'expirados') list = list.filter(function (m) { return getValidityStatus(m.expiryDate).type === 'expired'; });
   if (filter === 'baixo') list = list.filter(function (m) { return (m.quantity || 0) <= 10; });
   const detected = detectInteractions(list);
-  const backHref = category ? '#medicacao' : '#medicacao';
-  const catQs = category ? '&cat=' + encodeURIComponent(category) : '';
+  const catQs = category ? '?cat=' + encodeURIComponent(category) : '';
+  const filterBase = '#medicacao-armario' + catQs;
+
   let listHtml = '';
   list.forEach(function (m) {
-    const validity = getValidityStatus(m.expiryDate);
-    const stock = getStockStatus(m.quantity);
-    listHtml += '<li class="p-4 rounded-xl border border-outline bg-surface card-round"><div class="flex justify-between items-start"><div><h3 class="font-medium">' + (m.name || '').replace(/</g, '&lt;') + '</h3><p class="text-sm text-on-surface-variant">' + (m.dosage || '').replace(/</g, '&lt;') + ' · ' + (m.manufacturer || '').replace(/</g, '&lt;') + '</p><p class="text-sm">Quantidade: ' + (m.quantity ?? '-') + ' · Validade: ' + (formatDateYMD(m.expiryDate) || '-') + '</p><div class="flex gap-2 mt-2"><span class="text-xs px-2 py-0.5 rounded ' + (validity.type === 'expired' ? 'bg-red-100 text-red-800' : validity.type === 'soon' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800') + '">' + validity.label + '</span><span class="text-xs px-2 py-0.5 rounded ' + (stock.type === 'low' ? 'bg-red-100 text-red-800' : stock.type === 'medium' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800') + '">' + stock.label + '</span><span class="text-xs px-2 py-0.5 rounded bg-gray-100">' + (m.isActive ? 'Ativo' : 'Inativo') + '</span></div></div><div class="flex flex-col gap-1"><a href="#medicacao-detalhes?id=' + m.id + '" class="text-primary text-sm">Ver</a><a href="#medicacao-editar?id=' + m.id + '" class="text-primary text-sm">Editar</a><button type="button" class="text-red-600 text-sm delete-med" data-id="' + m.id + '">Remover</button></div></div></li>';
+    const nameEsc = (m.name || '').replace(/</g, '&lt;');
+    const dosageEsc = (m.dosage || '').replace(/</g, '&lt;');
+    const titleLine = (nameEsc + ' ' + dosageEsc).trim() || 'Medicamento';
+    const qty = m.quantity != null ? m.quantity : '-';
+    const validadeStr = formatDateYMD(m.expiryDate) || '-';
+    const cardBg = m.isActive ? 'bg-primary-container text-gray-800' : 'bg-white border border-gray-200 text-gray-800';
+    const dotHtml = m.isActive ? '<span class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-primary" aria-hidden="true" title="Ativo"></span>' : '';
+    listHtml += '<div class="rounded-2xl p-4 shadow-sm ' + cardBg + ' relative">' +
+      dotHtml +
+      '<div class="med-card-detail cursor-pointer block focus:outline-none" data-id="' + m.id + '" role="button" tabindex="0">' +
+      '<p class="font-bold text-sm leading-tight pr-6">' + titleLine + '</p>' +
+      '<p class="text-sm text-gray-600 mt-0.5">' + dosageEsc + '</p>' +
+      '<p class="text-sm text-gray-600 mt-0.5">' + qty + ' unidades</p>' +
+      '<p class="text-sm text-gray-600 mt-0.5">Validade: ' + validadeStr + '</p>' +
+      '</div>' +
+      '<div class="mt-2 flex gap-2 text-xs"><a href="#medicacao-editar?id=' + m.id + '" class="text-primary">Editar</a><button type="button" class="text-red-600 delete-med" data-id="' + m.id + '">Remover</button></div>' +
+      '</div>';
   });
-  let filterLinks = '<a href="#medicacao-armario' + (category ? '?cat=' + encodeURIComponent(category) : '') + '" class="whitespace-nowrap px-3 py-1 rounded-full text-sm ' + (!filter ? 'bg-primary text-on-primary' : 'bg-gray-200') + '">Todos</a>';
-  ['ativos', 'stock', 'expirando', 'expirados', 'baixo'].forEach(function (f) {
-    const label = f === 'ativos' ? 'Ativos' : f === 'stock' ? 'Em Stock' : f === 'expirando' ? 'Expirando' : f === 'expirados' ? 'Expirados' : 'Estoque baixo';
-    filterLinks += '<a href="#medicacao-armario?filter=' + f + catQs + '" class="whitespace-nowrap px-3 py-1 rounded-full text-sm ' + (filter === f ? 'bg-primary text-on-primary' : 'bg-gray-200') + '">' + label + '</a>';
+
+  let filterLinks = '<a href="' + filterBase + '" class="inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-full text-sm ' + (!filter ? 'bg-gray-200 text-gray-800' : 'bg-gray-100 text-gray-600') + '">' + (!filter ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + 'Todos</a>';
+  filterLinks += '<a href="' + filterBase + (catQs ? '&' : '?') + 'filter=ativos' + '" class="inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-full text-sm ' + (filter === 'ativos' ? 'bg-gray-200 text-gray-800' : 'bg-gray-100 text-gray-600') + '">' + (filter === 'ativos' ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + 'Medicamentos Ativos</a>';
+  ['stock', 'expirando', 'expirados', 'baixo'].forEach(function (f) {
+    const label = f === 'stock' ? 'Em Stock' : f === 'expirando' ? 'Expirando' : f === 'expirados' ? 'Expirados' : 'Estoque baixo';
+    const sep = catQs ? '&' : '?';
+    filterLinks += '<a href="' + filterBase + sep + 'filter=' + f + '" class="inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-full text-sm ' + (filter === f ? 'bg-gray-200 text-gray-800' : 'bg-gray-100 text-gray-600') + '">' + (filter === f ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + label + '</a>';
   });
+
   let banner = '';
-  if (detected.length > 0) banner = '<a href="#medicacao-interacoes" class="block p-3 rounded-xl bg-red-50 border border-red-200 text-red-800"><span class="material-icons align-middle text-lg mr-1">warning</span>Atenção: ' + detected.length + ' interação(ões) detetada(s). Toque para ver.</a>';
-  const emptyMsg = list.length === 0 ? '<p class="text-center text-on-surface-variant py-8">Nenhum medicamento encontrado.</p>' : '<ul class="space-y-3">' + listHtml + '</ul><button type="button" id="btn-adicionar-medicamento-fab" class="fixed bottom-24 right-4 w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg" aria-label="Adicionar medicamento"><span class="material-icons">add</span></button>';
+  if (detected.length > 0) banner = '<a href="#medicacao-interacoes" class="block p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm"><span class="material-icons align-middle text-lg mr-1">warning</span>Atenção: ' + detected.length + ' interação(ões) detetada(s). Toque para ver.</a>';
+  const gridOrEmpty = list.length === 0
+    ? '<p class="text-center text-on-surface-variant py-8">Nenhum medicamento encontrado.</p>'
+    : '<div class="grid grid-cols-2 gap-3">' + listHtml + '</div><button type="button" id="btn-adicionar-medicamento-fab" class="fixed bottom-24 right-4 w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg" aria-label="Adicionar medicamento"><span class="material-icons">add</span></button>';
+
   return pageHeader(category ? category : 'Armário de Medicamentos', '#medicacao') +
-    '<main class="p-4 space-y-3 bg-white"><input type="search" placeholder="Pesquisar nome ou fabricante..." class="w-full px-4 py-2 rounded-xl border border-gray-200" id="armario-search" value="' + (params.q || '').replace(/"/g, '&quot;') + '" />' +
-    '<div class="flex gap-2 overflow-x-auto pb-2">' + filterLinks + '</div>' + (category ? '<p class="text-sm text-on-surface-variant">Categoria: ' + category + '</p>' : '') + banner + emptyMsg + '</main>';
+    '<main class="p-4 space-y-4 bg-white">' +
+    '<a href="#medicacao" class="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-gray-100 text-gray-700 font-medium"><span class="material-icons text-lg">arrow_back</span>Voltar às Categorias</a>' +
+    '<input type="search" placeholder="Pesquisar nome ou fabricante..." class="w-full px-4 py-2 rounded-xl border border-gray-200" id="armario-search" value="' + (params.q || '').replace(/"/g, '&quot;') + '" />' +
+    '<h3 class="font-bold text-black">Os Meus Medicamentos</h3>' +
+    '<div class="flex flex-wrap gap-2">' + filterLinks + '</div>' +
+    '<p class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm bg-gray-100 text-gray-700"><span class="w-2 h-2 rounded-full bg-primary"></span>Medicamentos Ativos</p>' +
+    (category ? '<p class="text-sm text-on-surface-variant">Categoria: ' + category.replace(/</g, '&lt;') + '</p>' : '') +
+    banner +
+    gridOrEmpty +
+    '</main>';
 }
 
 function viewMedicacaoAdicionar(params) {
@@ -236,21 +275,38 @@ function viewMedicacaoAdicionar(params) {
   const nameVal = (prefilled.name || '').replace(/"/g, '&quot;');
   const dosageVal = (prefilled.dosage || '').replace(/"/g, '&quot;');
   const substanceVal = (prefilled.substance || '').replace(/"/g, '&quot;');
+  const manuVal = (params.titular || '---').replace(/"/g, '&quot;');
   return pageHeader('Adicionar Medicamento', '#medicacao') +
-    '<main class="p-4 bg-white"><form id="form-add-med" class="space-y-4">' +
-    '<div class="relative"><label class="block text-sm font-medium mb-1">Nome *</label><input type="text" name="name" required placeholder="Pesquisar ou escrever..." class="w-full px-4 py-2 input-outline" id="med-name" value="' + nameVal + '" autocomplete="off" /><ul class="autocomplete-list absolute left-0 right-0 z-10 mt-1 bg-white border border-outline rounded-lg shadow-lg max-h-60 overflow-y-auto hidden" id="autocomplete-list"></ul></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Dosagem *</label><input type="text" name="dosage" required class="w-full px-4 py-2 input-outline" value="' + dosageVal + '" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Substância ativa</label><input type="text" name="substance" class="w-full px-4 py-2 input-outline" id="med-substance" value="' + substanceVal + '" readonly /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Fabricante</label><input type="text" name="manufacturer" class="w-full px-4 py-2 input-outline" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Posologia</label><input type="text" name="posology" class="w-full px-4 py-2 input-outline" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Indicação Terapêutica</label><input type="text" name="indication" class="w-full px-4 py-2 input-outline" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Número de Unidades *</label><input type="number" name="quantity" required min="1" class="w-full px-4 py-2 input-outline" value="30" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Data de Validade *</label><input type="date" name="expiryDate" required min="' + todayStr() + '" class="w-full px-4 py-2 input-outline" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Categoria *</label><select name="category" required class="w-full px-4 py-2 input-outline"><option value="">Selecionar...</option>' + CATEGORIAS.map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('') + '</select></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Estado</label><select name="isActive" class="w-full px-4 py-2 input-outline"><option value="true">Ativo</option><option value="false">Não Ativo</option></select></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Notas</label><textarea name="notes" rows="2" class="w-full px-4 py-2 input-outline"></textarea></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Foto (opcional)</label><input type="file" name="image" accept="image/*" class="w-full px-4 py-2 input-outline" /></div>' +
-    '<button type="submit" class="w-full py-3 bg-primary text-on-primary font-medium rounded-xl btn-round">Guardar</button></form></main>';
+    '<main class="p-4 pb-8 bg-gray-50 min-h-screen"><form id="form-add-med" class="max-w-lg mx-auto">' +
+    '<section class="med-form-section">' +
+    '<h3 class="med-form-section-title"><span class="material-icons text-lg">medication</span>Identificação</h3>' +
+    '<div class="space-y-3">' +
+    '<div class="relative"><label class="med-form-label">Nome *</label><input type="text" name="name" required placeholder="Pesquisar ou escrever..." class="w-full px-4 py-2.5 input-outline" id="med-name" value="' + nameVal + '" autocomplete="off" /><ul class="autocomplete-list absolute left-0 right-0 z-10 mt-1 bg-white border border-outline rounded-xl shadow-lg max-h-60 overflow-y-auto hidden" id="autocomplete-list"></ul></div>' +
+    '<div><label class="med-form-label">Dosagem *</label><input type="text" name="dosage" required class="w-full px-4 py-2.5 input-outline" value="' + dosageVal + '" /></div>' +
+    '<div><label class="med-form-label">Substância ativa</label><input type="text" name="substance" class="w-full px-4 py-2.5 input-outline bg-gray-50" id="med-substance" value="' + substanceVal + '" readonly /></div>' +
+    '<div><label class="med-form-label">Fabricante (Titular de AIM)</label><input type="text" name="manufacturer" class="w-full px-4 py-2.5 input-outline" value="' + manuVal + '" placeholder="Preenchido ao pesquisar na lista INFOMED" /></div>' +
+    '</div></section>' +
+    '<section class="med-form-section">' +
+    '<h3 class="med-form-section-title"><span class="material-icons text-lg">description</span>Posologia e indicação</h3>' +
+    '<div class="space-y-3">' +
+    '<div><label class="med-form-label">Posologia</label><input type="text" name="posology" class="w-full px-4 py-2.5 input-outline" value="---" /></div>' +
+    '<div><label class="med-form-label">Indicação Terapêutica</label><input type="text" name="indication" class="w-full px-4 py-2.5 input-outline" value="---" /></div>' +
+    '</div></section>' +
+    '<section class="med-form-section">' +
+    '<h3 class="med-form-section-title"><span class="material-icons text-lg">inventory_2</span>Stock e validade</h3>' +
+    '<div class="space-y-3">' +
+    '<div><label class="med-form-label">Número de Unidades *</label><input type="number" name="quantity" required min="1" class="w-full px-4 py-2.5 input-outline" value="30" /></div>' +
+    '<div><label class="med-form-label">Data de Validade *</label><input type="date" name="expiryDate" required min="' + todayStr() + '" class="w-full px-4 py-2.5 input-outline" /></div>' +
+    '<div><label class="med-form-label">Categoria *</label><select name="category" required class="w-full px-4 py-2.5 input-outline"><option value="">Selecionar...</option>' + CATEGORIAS.map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('') + '</select></div>' +
+    '<div><label class="med-form-label">Estado</label><select name="isActive" class="w-full px-4 py-2.5 input-outline"><option value="true">Ativo</option><option value="false">Não Ativo</option></select></div>' +
+    '</div></section>' +
+    '<section class="med-form-section">' +
+    '<h3 class="med-form-section-title"><span class="material-icons text-lg">note</span>Outros</h3>' +
+    '<div class="space-y-3">' +
+    '<div><label class="med-form-label">Notas</label><textarea name="notes" rows="2" class="w-full px-4 py-2.5 input-outline resize-none"></textarea></div>' +
+    '<div><label class="med-form-label">Foto (opcional)</label><input type="file" name="image" accept="image/*" class="w-full px-4 py-2.5 input-outline text-sm" /></div>' +
+    '</div></section>' +
+    '<button type="submit" class="med-form-submit"><span class="material-icons">save</span>Guardar medicamento</button></form></main>';
 }
 
 function viewMedicacaoDetalhes(params) {
@@ -259,7 +315,7 @@ function viewMedicacaoDetalhes(params) {
   return pageHeader((m.name || '').replace(/</g, '&lt;'), '#medicacao-armario') +
     '<main class="p-4 space-y-4 bg-white">' +
     (m.imageUri ? '<img src="' + m.imageUri + '" alt="" class="w-full max-h-48 object-contain rounded-xl bg-gray-100" />' : '') +
-    '<dl class="space-y-2 text-sm"><dt class="text-on-surface-variant">Dosagem</dt><dd>' + (m.dosage || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Substância ativa</dt><dd>' + (m.substance || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Fabricante</dt><dd>' + (m.manufacturer || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Quantidade</dt><dd>' + (m.quantity ?? '-') + '</dd><dt class="text-on-surface-variant">Data de validade</dt><dd>' + (formatDateYMD(m.expiryDate) || '-') + '</dd><dt class="text-on-surface-variant">Categoria</dt><dd>' + (m.category || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Estado</dt><dd>' + (m.isActive ? 'Ativo' : 'Inativo') + '</dd><dt class="text-on-surface-variant">Notas</dt><dd>' + (m.notes || '-').replace(/</g, '&lt;') + '</dd></dl>' +
+    '<dl class="space-y-2 text-sm"><dt class="text-on-surface-variant">Dosagem</dt><dd>' + (m.dosage || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Substância ativa</dt><dd>' + (m.substance || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Fabricante</dt><dd>' + (m.manufacturer || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Posologia</dt><dd>' + (m.posology || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Indicação Terapêutica</dt><dd>' + (m.indication || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Quantidade</dt><dd>' + (m.quantity ?? '-') + '</dd><dt class="text-on-surface-variant">Data de validade</dt><dd>' + (formatDateYMD(m.expiryDate) || '-') + '</dd><dt class="text-on-surface-variant">Categoria</dt><dd>' + (m.category || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Estado</dt><dd>' + (m.isActive ? 'Ativo' : 'Inativo') + '</dd><dt class="text-on-surface-variant">Notas</dt><dd>' + (cleanNotesFromLegacy(m.notes) || '-').replace(/</g, '&lt;') + '</dd></dl>' +
     '<div class="flex flex-wrap gap-2"><a href="#medicacao-editar?id=' + m.id + '" class="px-4 py-2 bg-primary text-on-primary rounded-lg">Editar</a><a href="#medicacao-folheto?id=' + m.id + '" class="px-4 py-2 border border-outline rounded-lg">Ver folheto</a><a href="#medicacao-interacoes" class="px-4 py-2 border border-outline rounded-lg">Ver interações</a><a href="#medicacao-historico" class="px-4 py-2 border border-outline rounded-lg">Ver histórico</a></div></main>';
 }
 
@@ -268,17 +324,34 @@ function viewMedicacaoEditar(params) {
   if (!m) return viewMedicacaoCategorias();
   const catOpts = CATEGORIAS.map(function (c) { return '<option value="' + c + '"' + (m.category === c ? ' selected' : '') + '>' + c + '</option>'; }).join('');
   return pageHeader('Editar Medicamento', '#medicacao-detalhes?id=' + m.id) +
-    '<main class="p-4 bg-white"><form id="form-edit-med" data-id="' + m.id + '" class="space-y-4">' +
-    '<div><label class="block text-sm font-medium mb-1">Nome *</label><input type="text" name="name" required class="w-full px-4 py-2 input-outline" value="' + (m.name || '').replace(/"/g, '&quot;') + '" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Dosagem *</label><input type="text" name="dosage" required class="w-full px-4 py-2 input-outline" value="' + (m.dosage || '').replace(/"/g, '&quot;') + '" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Substância ativa</label><input type="text" name="substance" class="w-full px-4 py-2 input-outline" value="' + (m.substance || '').replace(/"/g, '&quot;') + '" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Fabricante</label><input type="text" name="manufacturer" class="w-full px-4 py-2 input-outline" value="' + (m.manufacturer || '').replace(/"/g, '&quot;') + '" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Número de Unidades *</label><input type="number" name="quantity" required min="1" class="w-full px-4 py-2 input-outline" value="' + (m.quantity ?? 0) + '" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Data de Validade *</label><input type="date" name="expiryDate" required class="w-full px-4 py-2 input-outline" value="' + (m.expiryDate || '') + '" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Categoria *</label><select name="category" required class="w-full px-4 py-2 input-outline">' + catOpts + '</select></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Estado</label><select name="isActive" class="w-full px-4 py-2 input-outline"><option value="true"' + (m.isActive ? ' selected' : '') + '>Ativo</option><option value="false"' + (!m.isActive ? ' selected' : '') + '>Não Ativo</option></select></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Notas</label><textarea name="notes" rows="2" class="w-full px-4 py-2 input-outline">' + (m.notes || '').replace(/</g, '&lt;') + '</textarea></div>' +
-    '<button type="submit" class="w-full py-3 bg-primary text-on-primary font-medium rounded-xl btn-round">Guardar alterações</button></form></main>';
+    '<main class="p-4 pb-8 bg-gray-50 min-h-screen"><form id="form-edit-med" data-id="' + m.id + '" class="max-w-lg mx-auto">' +
+    '<section class="med-form-section">' +
+    '<h3 class="med-form-section-title"><span class="material-icons text-lg">medication</span>Identificação</h3>' +
+    '<div class="space-y-3">' +
+    '<div><label class="med-form-label">Nome *</label><input type="text" name="name" required class="w-full px-4 py-2.5 input-outline" value="' + (m.name || '').replace(/"/g, '&quot;') + '" /></div>' +
+    '<div><label class="med-form-label">Dosagem *</label><input type="text" name="dosage" required class="w-full px-4 py-2.5 input-outline" value="' + (m.dosage || '').replace(/"/g, '&quot;') + '" /></div>' +
+    '<div><label class="med-form-label">Substância ativa</label><input type="text" name="substance" class="w-full px-4 py-2.5 input-outline" value="' + (m.substance || '').replace(/"/g, '&quot;') + '" /></div>' +
+    '<div><label class="med-form-label">Fabricante (Titular de AIM)</label><input type="text" name="manufacturer" class="w-full px-4 py-2.5 input-outline" value="' + (m.manufacturer || '').replace(/"/g, '&quot;') + '" /></div>' +
+    '</div></section>' +
+    '<section class="med-form-section">' +
+    '<h3 class="med-form-section-title"><span class="material-icons text-lg">description</span>Posologia e indicação</h3>' +
+    '<div class="space-y-3">' +
+    '<div><label class="med-form-label">Posologia</label><input type="text" name="posology" class="w-full px-4 py-2.5 input-outline" value="' + (m.posology || '').replace(/"/g, '&quot;') + '" /></div>' +
+    '<div><label class="med-form-label">Indicação Terapêutica</label><input type="text" name="indication" class="w-full px-4 py-2.5 input-outline" value="' + (m.indication || '').replace(/"/g, '&quot;') + '" /></div>' +
+    '</div></section>' +
+    '<section class="med-form-section">' +
+    '<h3 class="med-form-section-title"><span class="material-icons text-lg">inventory_2</span>Stock e validade</h3>' +
+    '<div class="space-y-3">' +
+    '<div><label class="med-form-label">Número de Unidades *</label><input type="number" name="quantity" required min="1" class="w-full px-4 py-2.5 input-outline" value="' + (m.quantity ?? 0) + '" /></div>' +
+    '<div><label class="med-form-label">Data de Validade *</label><input type="date" name="expiryDate" required class="w-full px-4 py-2.5 input-outline" value="' + (m.expiryDate || '') + '" /></div>' +
+    '<div><label class="med-form-label">Categoria *</label><select name="category" required class="w-full px-4 py-2.5 input-outline">' + catOpts + '</select></div>' +
+    '<div><label class="med-form-label">Estado</label><select name="isActive" class="w-full px-4 py-2.5 input-outline"><option value="true"' + (m.isActive ? ' selected' : '') + '>Ativo</option><option value="false"' + (!m.isActive ? ' selected' : '') + '>Não Ativo</option></select></div>' +
+    '</div></section>' +
+    '<section class="med-form-section">' +
+    '<h3 class="med-form-section-title"><span class="material-icons text-lg">note</span>Notas</h3>' +
+    '<div><label class="med-form-label">Notas</label><textarea name="notes" rows="2" class="w-full px-4 py-2.5 input-outline resize-none">' + (cleanNotesFromLegacy(m.notes || '')).replace(/</g, '&lt;') + '</textarea></div>' +
+    '</section>' +
+    '<button type="submit" class="med-form-submit"><span class="material-icons">save</span>Guardar alterações</button></form></main>';
 }
 
 function viewMedicacaoPesquisar() {
@@ -372,20 +445,34 @@ function viewLembretes() {
 
 function viewLembretesNovo() {
   const meds = getMedications().filter(function (m) { return m.isActive; });
-  const medOpts = meds.map(function (m) { return '<option value="' + m.id + '">' + m.name + ' - ' + m.dosage + '</option>'; }).join('');
+  const medButtons = meds.length === 0
+    ? '<p class="text-xs text-on-surface-variant">Não existem medicamentos ativos. Adicione primeiro um medicamento.</p>'
+    : meds.map(function (m) {
+        return '<button type="button" class="med-option flex items-center justify-between w-full px-4 py-3 rounded-xl border border-outline bg-white text-left" data-id="' + m.id + '">' +
+          '<span class="flex flex-col"><span class="text-sm font-medium">' + (m.name || '').replace(/</g, '&lt;') + '</span><span class="text-xs text-on-surface-variant">' + (m.dosage || '').replace(/</g, '&lt;') + '</span></span>' +
+          '<span class="material-icons text-primary text-lg med-check opacity-0">check_circle</span>' +
+          '</button>';
+      }).join('');
+  const periodButtons = PERIODOS.map(function (p, idx) {
+    const range = (p.start || '') + '–' + (p.end || '');
+    return '<button type="button" class="period-option flex items-center justify-between w-full px-4 py-3 rounded-xl border border-outline bg-white text-left' + (idx === 0 ? ' is-active' : '') + '" data-id="' + p.id + '">' +
+      '<span class="flex items-center gap-2"><span class="material-icons text-primary text-lg">' + (p.icon || 'schedule') + '</span><span class="text-sm font-medium">' + p.label + '</span></span>' +
+      '<span class="text-xs text-on-surface-variant">' + range + '</span>' +
+      '</button>';
+  }).join('');
   return pageHeader('Novo Lembrete', '#lembretes') +
     '<main class="p-4 bg-white"><form id="form-new-reminder" class="space-y-4">' +
-    '<div><label class="block text-sm font-medium mb-1">Medicamento *</label><select name="medicationId" required class="w-full px-4 py-2 input-outline"><option value="">Selecionar...</option>' + medOpts + '</select></div>' +
+    '<div><label class="block text-sm font-medium mb-1">Medicamento ativo *</label><div id="rem-medication-list" class="space-y-2">' + medButtons + '</div><input type="hidden" name="medicationId" id="rem-medication-id" required /></div>' +
     '<div><label class="block text-sm font-medium mb-1">Data início *</label><input type="date" name="startDate" required value="' + todayStr() + '" class="w-full px-4 py-2 input-outline" /></div>' +
     '<div><label class="block text-sm font-medium mb-1">Data fim</label><input type="date" name="endDate" class="w-full px-4 py-2 input-outline" /></div>' +
     '<div>' +
-    '<label class="block text-sm font-medium mb-1">Horários (até 3 por dia) *</label>' +
-    '<div id="reminder-times-container" class="space-y-2">' +
-    '<div class="flex items-center gap-2 time-row"><input type="time" name="time" required class="flex-1 px-4 py-2 input-outline" />' +
-    '<button type="button" class="remove-time-btn hidden text-gray-400"><span class="material-icons text-base">close</span></button></div>' +
+    '<label class="block text-sm font-medium mb-1">Selecione Período</label>' +
+    '<div id="rem-period-list" class="space-y-2">' + periodButtons + '</div>' +
+    '<div class="mt-4">' +
+    '<p class="text-sm font-medium mb-1">Selecione até 3 horários</p>' +
+    '<div id="rem-time-grid" class="grid grid-cols-3 gap-2"></div>' +
+    '<p class="text-xs text-on-surface-variant mt-1">Os horários são sugeridos de 30 em 30 minutos dentro do período escolhido.</p>' +
     '</div>' +
-    '<button type="button" id="btn-add-time" class="mt-2 text-sm text-primary flex items-center gap-1"><span class="material-icons text-base">add</span><span>Adicionar hora</span></button>' +
-    '<p class="text-xs text-on-surface-variant mt-1">Pode definir até 3 horários diferentes para este lembrete.</p>' +
     '</div>' +
     '<button type="submit" class="w-full py-3 bg-primary text-on-primary font-medium rounded-xl btn-round">Criar lembrete</button></form></main>';
 }
@@ -394,23 +481,37 @@ function viewLembretesEditar(params) {
   const r = getReminderById(params.id);
   if (!r) return viewLembretes();
   const meds = getMedications().filter(function (m) { return m.isActive; });
-  const medOpts = meds.map(function (m) { return '<option value="' + m.id + '"' + (m.id === r.medicationId ? ' selected' : '') + '>' + m.name + ' - ' + m.dosage + '</option>'; }).join('');
-  const timesArr = (r.times && r.times.length ? r.times : [r.time]).filter(function (t) { return !!t; });
-  const rowsHtml = (timesArr.length ? timesArr : ['']).map(function (t, idx) {
-    const canRemove = idx > 0;
-    return '<div class="flex items-center gap-2 time-row"><input type="time" name="time" value="' + (t || '') + '" class="flex-1 px-4 py-2 input-outline"' + (idx === 0 ? ' required' : '') + ' />' +
-      '<button type="button" class="remove-time-btn ' + (canRemove ? '' : 'hidden') + ' text-gray-400"><span class="material-icons text-base">close</span></button></div>';
+  const medButtons = meds.length === 0
+    ? '<p class="text-xs text-on-surface-variant">Não existem medicamentos ativos.</p>'
+    : meds.map(function (m) {
+        const selected = m.id === r.medicationId;
+        return '<button type="button" class="med-option flex items-center justify-between w-full px-4 py-3 rounded-xl border ' +
+          (selected ? 'border-primary bg-primary-container' : 'border-outline bg-white') +
+          ' text-left" data-id="' + m.id + '">' +
+          '<span class="flex flex-col"><span class="text-sm font-medium">' + (m.name || '').replace(/</g, '&lt;') + '</span><span class="text-xs text-on-surface-variant">' + (m.dosage || '').replace(/</g, '&lt;') + '</span></span>' +
+          '<span class="material-icons text-primary text-lg med-check ' + (selected ? '' : 'opacity-0') + '">check_circle</span>' +
+          '</button>';
+      }).join('');
+  const periodButtons = PERIODOS.map(function (p, idx) {
+    const range = (p.start || '') + '–' + (p.end || '');
+    return '<button type="button" class="period-option flex items-center justify-between w-full px-4 py-3 rounded-xl border border-outline bg-white text-left' + (idx === 0 ? ' is-active' : '') + '" data-id="' + p.id + '">' +
+      '<span class="flex items-center gap-2"><span class="material-icons text-primary text-lg">' + (p.icon || 'schedule') + '</span><span class="text-sm font-medium">' + p.label + '</span></span>' +
+      '<span class="text-xs text-on-surface-variant">' + range + '</span>' +
+      '</button>';
   }).join('');
   return pageHeader('Editar Lembrete', '#lembretes') +
     '<main class="p-4 bg-white"><form id="form-edit-reminder" data-id="' + r.id + '" class="space-y-4">' +
-    '<div><label class="block text-sm font-medium mb-1">Medicamento *</label><select name="medicationId" required class="w-full px-4 py-2 input-outline">' + medOpts + '</select></div>' +
+    '<div><label class="block text-sm font-medium mb-1">Medicamento ativo *</label><div id="rem-medication-list" class="space-y-2">' + medButtons + '</div><input type="hidden" name="medicationId" id="rem-medication-id" value="' + (r.medicationId || '') + '" required /></div>' +
     '<div><label class="block text-sm font-medium mb-1">Data início *</label><input type="date" name="startDate" required value="' + (r.startDate || '') + '" class="w-full px-4 py-2 input-outline" /></div>' +
     '<div><label class="block text-sm font-medium mb-1">Data fim</label><input type="date" name="endDate" value="' + (r.endDate || '') + '" class="w-full px-4 py-2 input-outline" /></div>' +
     '<div>' +
-    '<label class="block text-sm font-medium mb-1">Horários (até 3 por dia) *</label>' +
-    '<div id="reminder-times-container" class="space-y-2">' + rowsHtml + '</div>' +
-    '<button type="button" id="btn-add-time" class="mt-2 text-sm text-primary flex items-center gap-1"><span class="material-icons text-base">add</span><span>Adicionar hora</span></button>' +
-    '<p class="text-xs text-on-surface-variant mt-1">Pode definir até 3 horários diferentes para este lembrete.</p>' +
+    '<label class="block text-sm font-medium mb-1">Selecione Período</label>' +
+    '<div id="rem-period-list" class="space-y-2">' + periodButtons + '</div>' +
+    '<div class="mt-4">' +
+    '<p class="text-sm font-medium mb-1">Selecione até 3 horários</p>' +
+    '<div id="rem-time-grid" class="grid grid-cols-3 gap-2"></div>' +
+    '<p class="text-xs text-on-surface-variant mt-1">Os horários são sugeridos de 30 em 30 minutos dentro do período escolhido.</p>' +
+    '</div>' +
     '</div>' +
     '<button type="submit" class="w-full py-3 bg-primary text-on-primary font-medium rounded-xl btn-round">Guardar</button></form></main>';
 }
@@ -608,7 +709,9 @@ function afterRender(path, params) {
       isActive: fd.get('isActive') === 'true',
       isInStock: true,
       addedDate: todayStr(),
-      notes: [fd.get('posology') && ('Posologia: ' + fd.get('posology')), fd.get('indication') && ('Indicação: ' + fd.get('indication')), fd.get('notes')].filter(Boolean).join('. ') || '',
+      posology: fd.get('posology') || '',
+      indication: fd.get('indication') || '',
+      notes: fd.get('notes') || '',
       reminderTimes: [],
       dailyDosage: '',
       imageUri: imageUri || null,
@@ -638,6 +741,8 @@ function afterRender(path, params) {
       m.manufacturer = fd.get('manufacturer') || '';
       m.category = fd.get('category');
       m.isActive = fd.get('isActive') === 'true';
+      m.posology = fd.get('posology') || '';
+      m.indication = fd.get('indication') || '';
       m.notes = fd.get('notes') || '';
       saveMedication(m);
       navigate('medicacao-detalhes', { id: id });
@@ -645,12 +750,22 @@ function afterRender(path, params) {
   }
 
   document.querySelectorAll('.delete-med').forEach(function (btn) {
+    btn.addEventListener('click', function (e) { e.stopPropagation(); });
     btn.addEventListener('click', function () {
       if (confirm('Remover este medicamento?')) {
         deleteMedication(btn.dataset.id);
         runRoute();
       }
     });
+  });
+
+  document.querySelectorAll('.med-card-detail').forEach(function (el) {
+    el.addEventListener('click', function () {
+      var id = el.dataset.id;
+      var m = getMedicationById(id);
+      if (m) showMedicationDetailModal(m);
+    });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); } });
   });
 
   document.querySelectorAll('.travel-check').forEach(function (cb) {
@@ -660,59 +775,147 @@ function afterRender(path, params) {
     });
   });
 
-  function setupReminderTimesForm(form) {
-    var container = form.querySelector('#reminder-times-container');
-    var addBtn = form.querySelector('#btn-add-time');
-    if (!container || !addBtn) return;
-
-    function normalizeRows() {
-      var rows = container.querySelectorAll('.time-row');
-      rows.forEach(function (row, idx) {
-        var input = row.querySelector('input[name="time"]');
-        var rm = row.querySelector('.remove-time-btn');
-        if (input) input.required = idx === 0;
-        if (rm) rm.classList.toggle('hidden', idx === 0);
-      });
-      var count = rows.length;
-      addBtn.disabled = count >= 3;
-      addBtn.classList.toggle('opacity-50', count >= 3);
+  function setupReminderForm(form, options) {
+    options = options || {};
+    var selectedTimes = (options.initialTimes || []).slice(0, 3);
+    var medHidden = form.querySelector('#rem-medication-id');
+    if (options.initialMedicationId && medHidden) {
+      medHidden.value = options.initialMedicationId;
     }
 
-    addBtn.addEventListener('click', function () {
-      var rows = container.querySelectorAll('.time-row');
-      if (rows.length >= 3) return;
-      var row = document.createElement('div');
-      row.className = 'flex items-center gap-2 time-row';
-      row.innerHTML = '<input type="time" name="time" class="flex-1 px-4 py-2 input-outline" />' +
-        '<button type="button" class="remove-time-btn text-gray-400"><span class="material-icons text-base">close</span></button>';
-      container.appendChild(row);
-      normalizeRows();
+    // Seleção de medicamento (cards)
+    var medButtons = form.querySelectorAll('.med-option');
+    medButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.dataset.id;
+        if (!id || !medHidden) return;
+        medHidden.value = id;
+        medButtons.forEach(function (other) {
+          other.classList.remove('border-primary', 'bg-primary-container');
+          other.classList.add('border-outline', 'bg-white');
+          var icon = other.querySelector('.med-check');
+          if (icon) icon.classList.add('opacity-0');
+        });
+        btn.classList.remove('border-outline', 'bg-white');
+        btn.classList.add('border-primary', 'bg-primary-container');
+        var icon = btn.querySelector('.med-check');
+        if (icon) icon.classList.remove('opacity-0');
+      });
     });
 
-    container.addEventListener('click', function (e) {
-      var rmBtn = e.target.closest('.remove-time-btn');
-      if (!rmBtn) return;
-      var rows = container.querySelectorAll('.time-row');
-      if (rows.length <= 1) return;
-      var row = rmBtn.closest('.time-row');
-      if (row) row.remove();
-      normalizeRows();
+    // Períodos e grelha de horários (30 em 30 min)
+    var periodBtns = form.querySelectorAll('.period-option');
+    var timeGrid = form.querySelector('#rem-time-grid');
+    if (!timeGrid || !periodBtns.length) {
+      form._getSelectedTimes = function () { return selectedTimes.slice(); };
+      return;
+    }
+
+    function timeToMinutes(t) {
+      var parts = (t || '').split(':');
+      var h = parseInt(parts[0] || '0', 10);
+      var m = parseInt(parts[1] || '0', 10);
+      return h * 60 + m;
+    }
+
+    function minutesToTime(min) {
+      var h = Math.floor(min / 60);
+      var m = min % 60;
+      return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    }
+
+    function getPeriodById(id) {
+      return PERIODOS.find(function (p) { return p.id === id; }) || PERIODOS[0];
+    }
+
+    var activePeriodId = (function () {
+      if (options.initialTimes && options.initialTimes.length) {
+        var t0 = options.initialTimes[0];
+        var baseMin = timeToMinutes(t0);
+        for (var i = 0; i < PERIODOS.length; i++) {
+          var p = PERIODOS[i];
+          if (!p.start || !p.end) continue;
+          var s = timeToMinutes(p.start);
+          var e = timeToMinutes(p.end);
+          if (baseMin >= s && baseMin <= e) return p.id;
+        }
+      }
+      var firstBtn = periodBtns[0];
+      return firstBtn ? firstBtn.dataset.id : (PERIODOS[0] && PERIODOS[0].id);
+    })();
+
+    function updatePeriodHighlight() {
+      periodBtns.forEach(function (btn) {
+        var isActive = btn.dataset.id === activePeriodId;
+        btn.classList.toggle('is-active', isActive);
+        if (isActive) {
+          btn.classList.add('border-primary', 'bg-primary-container');
+          btn.classList.remove('border-outline', 'bg-white');
+        } else {
+          btn.classList.remove('border-primary', 'bg-primary-container');
+          btn.classList.add('border-outline', 'bg-white');
+        }
+      });
+    }
+
+    function renderTimeGrid() {
+      var period = getPeriodById(activePeriodId);
+      if (!period || !period.start || !period.end) {
+        timeGrid.innerHTML = '';
+        return;
+      }
+      var startMin = timeToMinutes(period.start);
+      var endMin = timeToMinutes(period.end);
+      var html = '';
+      for (var m = startMin; m <= endMin; m += 30) {
+        var t = minutesToTime(m);
+        var selected = selectedTimes.indexOf(t) !== -1;
+        html += '<button type="button" class="time-chip px-3 py-1.5 rounded-full text-xs font-medium border ' +
+          (selected ? 'border-primary bg-primary text-on-primary' : 'border-outline bg-white text-black') +
+          '" data-time="' + t + '">' + t + '</button>';
+      }
+      timeGrid.innerHTML = html;
+    }
+
+    periodBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        activePeriodId = btn.dataset.id;
+        updatePeriodHighlight();
+        renderTimeGrid();
+      });
     });
 
-    normalizeRows();
+    timeGrid.addEventListener('click', function (e) {
+      var chip = e.target.closest('.time-chip');
+      if (!chip) return;
+      var t = chip.dataset.time;
+      if (!t) return;
+      var idx = selectedTimes.indexOf(t);
+      if (idx !== -1) {
+        selectedTimes.splice(idx, 1);
+      } else {
+        if (selectedTimes.length >= 3) {
+          alert('Só pode selecionar até 3 horários distintos.');
+          return;
+        }
+        selectedTimes.push(t);
+      }
+      renderTimeGrid();
+    });
+
+    updatePeriodHighlight();
+    renderTimeGrid();
+
+    form._getSelectedTimes = function () { return selectedTimes.slice(); };
   }
 
   var formNewRem = document.getElementById('form-new-reminder');
   if (formNewRem) {
-    setupReminderTimesForm(formNewRem);
+    setupReminderForm(formNewRem, { initialTimes: [] });
     formNewRem.addEventListener('submit', function (e) {
       e.preventDefault();
       var fd = new FormData(formNewRem);
-      var times = [];
-      formNewRem.querySelectorAll('input[name="time"]').forEach(function (input) {
-        var v = (input.value || '').trim();
-        if (v) times.push(v);
-      });
+      var times = (typeof formNewRem._getSelectedTimes === 'function') ? formNewRem._getSelectedTimes() : [];
       if (!times.length) {
         alert('Selecione pelo menos um horário.');
         return;
@@ -736,18 +939,21 @@ function afterRender(path, params) {
 
   var formEditRem = document.getElementById('form-edit-reminder');
   if (formEditRem) {
-    setupReminderTimesForm(formEditRem);
+    var existingRem = getReminderById(formEditRem.dataset.id);
+    var initialTimesEdit = existingRem && Array.isArray(existingRem.times)
+      ? existingRem.times
+      : (existingRem && existingRem.time ? [existingRem.time] : []);
+    setupReminderForm(formEditRem, {
+      initialTimes: initialTimesEdit,
+      initialMedicationId: existingRem ? existingRem.medicationId : null,
+    });
     formEditRem.addEventListener('submit', function (e) {
       e.preventDefault();
       var id = formEditRem.dataset.id;
       var fd = new FormData(formEditRem);
       var r = getReminderById(id);
       if (!r) return;
-      var timesEdit = [];
-      formEditRem.querySelectorAll('input[name="time"]').forEach(function (input) {
-        var v = (input.value || '').trim();
-        if (v) timesEdit.push(v);
-      });
+      var timesEdit = (typeof formEditRem._getSelectedTimes === 'function') ? formEditRem._getSelectedTimes() : [];
       if (!timesEdit.length) {
         alert('Selecione pelo menos um horário.');
         return;
@@ -768,13 +974,24 @@ function afterRender(path, params) {
     btn.addEventListener('click', function () {
       var r = getReminderById(btn.dataset.id);
       if (r) {
+        var med = getMedicationById(r.medicationId);
         var today = todayStr();
         if (r.lastTakenDate === today) {
-          // Voltar a "Não Tomado"
+          // Voltar a "Não Tomado" (clique por engano): repor 1 unidade
           r.lastTakenDate = null;
+          if (med && (med.quantity != null)) {
+            med.quantity = (parseInt(med.quantity, 10) || 0) + 1;
+            saveMedication(med);
+          }
         } else {
-          // Marcar como "Já Tomei" hoje
-          var med = getMedicationById(r.medicationId);
+          // Marcar como "Já Tomei" hoje: descontar 1 unidade
+          if (med && (med.quantity != null)) {
+            var qty = parseInt(med.quantity, 10) || 0;
+            if (qty > 0) {
+              med.quantity = qty - 1;
+              saveMedication(med);
+            }
+          }
           addMedicationHistory({
             medicationName: med ? med.name : '',
             dosage: med ? med.dosage : '',
@@ -863,7 +1080,10 @@ function afterRender(path, params) {
         }
         pesquisaResultados.innerHTML = results.map(function (item) {
           var d = getItemDisplay(item);
-          var goto = '#medicacao-adicionar?nome=' + encodeURIComponent(d.name) + '&dosagem=' + encodeURIComponent(d.dosage) + '&substancia=' + encodeURIComponent(d.substance);
+          var goto = '#medicacao-adicionar?nome=' + encodeURIComponent(d.name) +
+            '&dosagem=' + encodeURIComponent(d.dosage) +
+            '&substancia=' + encodeURIComponent(d.substance) +
+            '&titular=' + encodeURIComponent(d.titular || '');
           return '<li><a href="' + goto + '" class="block p-3 rounded-xl border border-outline hover:bg-primary-container">' + (d.name || '').replace(/</g, '&lt;') + ' · ' + (d.dosage || '').replace(/</g, '&lt;') + '</a></li>';
         }).join('');
       });
@@ -911,9 +1131,67 @@ function showInteractionsModal(detected, onClose) {
   document.getElementById('modal-overlay').addEventListener('click', function (e) { if (e.target.id === 'modal-overlay') { document.getElementById('modal-overlay').remove(); if (onClose) onClose(); } });
 }
 
+function showMedicationDetailModal(m) {
+  if (!m) return;
+  var nameEsc = (m.name || '').replace(/</g, '&lt;');
+  var dosageEsc = (m.dosage || '-').replace(/</g, '&lt;');
+  var substanceEsc = (m.substance || '-').replace(/</g, '&lt;');
+  var manufacturerEsc = (m.manufacturer || '-').replace(/</g, '&lt;');
+  var validityEsc = (formatDateYMD(m.expiryDate) || '-').replace(/</g, '&lt;');
+  var categoryEsc = (m.category || '-').replace(/</g, '&lt;');
+  var stateStr = m.isActive ? 'Ativo' : 'Inativo';
+  var posologyEsc = (m.posology || '-').replace(/</g, '&lt;');
+  var indicationEsc = (m.indication || '-').replace(/</g, '&lt;');
+  var notesEsc = (cleanNotesFromLegacy(m.notes) || '-').replace(/</g, '&lt;');
+  var imgBlock = m.imageUri ? '<img src="' + m.imageUri.replace(/"/g, '&quot;') + '" alt="" class="w-full max-h-40 object-contain rounded-xl bg-gray-100" />' : '';
+  var body = '<div id="modal-med-detail" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">' +
+    '<div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-hidden shadow-xl border border-gray-100">' +
+    '<div class="bg-primary text-on-primary px-4 py-3 flex items-center justify-between">' +
+    '<h2 class="font-bold text-lg truncate pr-2">' + nameEsc + '</h2>' +
+    '<button type="button" class="modal-med-close flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center" aria-label="Fechar"><span class="material-icons text-lg">close</span></button>' +
+    '</div>' +
+    '<div class="p-4 overflow-y-auto max-h-[calc(90vh-8rem)]">' +
+    imgBlock +
+    '<dl class="grid grid-cols-1 gap-2 mt-4 text-sm">' +
+    '<div class="flex justify-between py-2 border-b border-gray-100"><dt class="text-gray-500">Dosagem</dt><dd class="font-medium">' + dosageEsc + '</dd></div>' +
+    '<div class="flex justify-between py-2 border-b border-gray-100"><dt class="text-gray-500">Substância ativa</dt><dd class="font-medium">' + substanceEsc + '</dd></div>' +
+    '<div class="flex justify-between py-2 border-b border-gray-100"><dt class="text-gray-500">Fabricante</dt><dd class="font-medium">' + manufacturerEsc + '</dd></div>' +
+    '<div class="flex justify-between py-2 border-b border-gray-100"><dt class="text-gray-500">Posologia</dt><dd class="text-right max-w-[60%]">' + posologyEsc + '</dd></div>' +
+    '<div class="flex justify-between py-2 border-b border-gray-100"><dt class="text-gray-500">Indicação Terapêutica</dt><dd class="text-right max-w-[60%]">' + indicationEsc + '</dd></div>' +
+    '<div class="flex justify-between py-2 border-b border-gray-100"><dt class="text-gray-500">Quantidade</dt><dd>' + (m.quantity ?? '-') + '</dd></div>' +
+    '<div class="flex justify-between py-2 border-b border-gray-100"><dt class="text-gray-500">Data de validade</dt><dd>' + validityEsc + '</dd></div>' +
+    '<div class="flex justify-between py-2 border-b border-gray-100"><dt class="text-gray-500">Categoria</dt><dd>' + categoryEsc + '</dd></div>' +
+    '<div class="flex justify-between py-2 border-b border-gray-100"><dt class="text-gray-500">Estado</dt><dd>' + stateStr + '</dd></div>' +
+    '<div class="flex justify-between py-2 border-b border-gray-100"><dt class="text-gray-500">Notas</dt><dd class="text-right max-w-[60%]">' + notesEsc + '</dd></div>' +
+    '</dl>' +
+    '<div class="flex flex-wrap gap-2 mt-4">' +
+    '<a href="#medicacao-editar?id=' + m.id + '" class="modal-med-link inline-flex items-center gap-1 px-4 py-2 rounded-xl bg-primary text-on-primary font-medium text-sm"><span class="material-icons text-base">edit</span>Editar</a>' +
+    '<a href="#medicacao-folheto?id=' + m.id + '" class="modal-med-link inline-flex items-center gap-1 px-4 py-2 rounded-xl border-2 border-primary text-primary font-medium text-sm">Ver folheto</a>' +
+    '<a href="#medicacao-interacoes" class="modal-med-link inline-flex items-center gap-1 px-4 py-2 rounded-xl border-2 border-secondary text-secondary font-medium text-sm">Ver interações</a>' +
+    '<a href="#medicacao-historico" class="modal-med-link inline-flex items-center gap-1 px-4 py-2 rounded-xl border-2 border-gray-300 text-gray-700 font-medium text-sm">Ver histórico</a>' +
+    '</div></div></div></div>';
+  document.body.insertAdjacentHTML('beforeend', body);
+  function closeModal() { var el = document.getElementById('modal-med-detail'); if (el) el.remove(); }
+  var wrap = document.getElementById('modal-med-detail');
+  wrap.querySelector('.modal-med-close').addEventListener('click', closeModal);
+  wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+  wrap.querySelectorAll('.modal-med-link').forEach(function (link) {
+    link.addEventListener('click', function (e) { e.preventDefault(); closeModal(); window.location.hash = this.getAttribute('href') || ''; });
+  });
+}
+
 function init() {
   loadInfomed().catch(function () {});
   seedMedicationsIfEmpty();
+  var meds = getMedications();
+  var changed = false;
+  meds.forEach(function (m) {
+    if (m.notes && typeof m.notes === 'string') {
+      var cleaned = cleanNotesFromLegacy(m.notes);
+      if (cleaned !== m.notes) { m.notes = cleaned; changed = true; }
+    }
+  });
+  if (changed) setMedications(meds);
   var s = getSettings();
   document.getElementById('body-theme').classList.toggle('dark', s.theme === 'dark');
   if (s.notifications && typeof Notification !== 'undefined' && Notification.permission === 'default') Notification.requestPermission();

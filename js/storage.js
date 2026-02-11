@@ -130,14 +130,7 @@ function addMedicationHistory(entry) {
   return entry;
 }
 
-// Seed from user_medications.json if empty (apenas com protocolo http/https)
+// Seed inicial desativado (já não usa user_medications.json)
 function seedMedicationsIfEmpty() {
-  if (getMedications().length > 0) return;
-  if (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:') return;
-  fetch('user_medications.json')
-    .then((r) => r.json())
-    .then((arr) => {
-      if (Array.isArray(arr) && arr.length) setMedications(arr);
-    })
-    .catch(() => {});
+  // Não carrega medicamentos de ficheiro externo; a lista fica vazia até o utilizador adicionar.
 }
