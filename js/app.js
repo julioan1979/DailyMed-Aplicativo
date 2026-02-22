@@ -550,11 +550,61 @@ function viewMedicacaoAdicionar(params) {
 function viewMedicacaoDetalhes(params) {
   const m = getMedicationById(params.id);
   if (!m) return viewMedicacaoCategorias();
-  return pageHeader((m.name || '').replace(/</g, '&lt;'), '#medicacao-armario') +
+  const nameEsc = (m.name || 'Medicamento').replace(/</g, '&lt;');
+  const dosageEsc = (m.dosage || '-').replace(/</g, '&lt;');
+  const substanceEsc = (m.substance || '-').replace(/</g, '&lt;');
+  const manufacturerEsc = (m.manufacturer || '-').replace(/</g, '&lt;');
+  const posologyEsc = (m.posology || '-').replace(/</g, '&lt;');
+  const indicationEsc = (m.indication || '-').replace(/</g, '&lt;');
+  const categoryEsc = (m.category || '-').replace(/</g, '&lt;');
+  const notesEsc = (cleanNotesFromLegacy(m.notes) || '-').replace(/</g, '&lt;');
+  const validadeStr = formatDateYMD(m.expiryDate) || '-';
+  const validity = getValidityStatus(m.expiryDate);
+  const validityBadge = validity.type === 'expired'
+    ? '<span class="pill pill--danger">Expirado</span>'
+    : validity.type === 'soon'
+      ? '<span class="pill pill--warning">Expira em breve</span>'
+      : '<span class="pill pill--ok">Válido</span>';
+  const stockStatus = getStockStatus(parseInt(m.quantity || 0, 10) || 0);
+  const stockBadge = stockStatus.type === 'low'
+    ? '<span class="pill pill--danger">Stock baixo</span>'
+    : stockStatus.type === 'medium'
+      ? '<span class="pill pill--warning">Stock médio</span>'
+      : '<span class="pill pill--ok">Stock OK</span>';
+  const imgBlock = m.imageUri
+    ? '<img src="' + m.imageUri + '" alt="" class="w-full max-h-52 object-contain rounded-2xl bg-gray-100 border border-gray-200" />'
+    : '<div class="med-hero-placeholder"><span class="material-icons">medication</span></div>';
+  return pageHeader(nameEsc, '#medicacao-armario') +
     '<main class="app-main space-y-4 bg-white">' +
-    (m.imageUri ? '<img src="' + m.imageUri + '" alt="" class="w-full max-h-48 object-contain rounded-xl bg-gray-100" />' : '') +
-    '<dl class="space-y-2 text-sm"><dt class="text-on-surface-variant">Dosagem</dt><dd>' + (m.dosage || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Substância ativa</dt><dd>' + (m.substance || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Fabricante</dt><dd>' + (m.manufacturer || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Posologia</dt><dd>' + (m.posology || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Indicação Terapêutica</dt><dd>' + (m.indication || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Quantidade</dt><dd>' + (m.quantity ?? '-') + '</dd><dt class="text-on-surface-variant">Data de validade</dt><dd>' + (formatDateYMD(m.expiryDate) || '-') + '</dd><dt class="text-on-surface-variant">Categoria</dt><dd>' + (m.category || '-').replace(/</g, '&lt;') + '</dd><dt class="text-on-surface-variant">Estado</dt><dd>' + (m.isActive ? 'Ativo' : 'Inativo') + '</dd><dt class="text-on-surface-variant">Notas</dt><dd>' + (cleanNotesFromLegacy(m.notes) || '-').replace(/</g, '&lt;') + '</dd></dl>' +
-    '<div class="flex flex-wrap gap-2"><a href="#medicacao-editar?id=' + m.id + '" class="btn-primary">Editar</a><a href="#medicacao-folheto?id=' + m.id + '" class="btn-outline">Ver folheto</a><a href="#medicacao-interacoes" class="btn-outline">Ver interações</a><a href="#medicacao-historico" class="btn-outline">Ver histórico</a></div></main>';
+    '<section class="med-hero">' +
+    imgBlock +
+    '<div class="med-hero__info">' +
+    '<h3 class="med-hero__title">' + nameEsc + '</h3>' +
+    '<p class="med-hero__sub">' + dosageEsc + '</p>' +
+    '<div class="med-hero__chips">' + validityBadge + stockBadge + '</div>' +
+    '</div>' +
+    '</section>' +
+    '<section class="med-detail-card">' +
+    '<h4 class="med-detail-title">Detalhes</h4>' +
+    '<dl class="med-detail-grid">' +
+    '<div><dt>Substância ativa</dt><dd>' + substanceEsc + '</dd></div>' +
+    '<div><dt>Fabricante</dt><dd>' + manufacturerEsc + '</dd></div>' +
+    '<div><dt>Posologia</dt><dd>' + posologyEsc + '</dd></div>' +
+    '<div><dt>Indicação Terapêutica</dt><dd>' + indicationEsc + '</dd></div>' +
+    '<div><dt>Quantidade</dt><dd>' + (m.quantity ?? '-') + '</dd></div>' +
+    '<div><dt>Data de validade</dt><dd>' + validadeStr + '</dd></div>' +
+    '<div><dt>Categoria</dt><dd>' + categoryEsc + '</dd></div>' +
+    '<div><dt>Estado</dt><dd>' + (m.isActive ? 'Ativo' : 'Inativo') + '</dd></div>' +
+    '</dl>' +
+    '<div class="med-notes"><dt>Notas</dt><dd>' + notesEsc + '</dd></div>' +
+    '</section>' +
+    '<section class="med-actions">' +
+    '<a href="#medicacao-editar?id=' + m.id + '" class="btn-primary w-full">Editar</a>' +
+    '<a href="#medicacao-folheto?id=' + m.id + '" class="btn-outline w-full">Ver folheto</a>' +
+    '<a href="#medicacao-interacoes" class="btn-ghost w-full">Ver interações</a>' +
+    '<a href="#medicacao-historico" class="btn-ghost w-full">Ver histórico</a>' +
+    '</section>' +
+    '</main>';
 }
 
 function viewMedicacaoEditar(params) {
@@ -616,8 +666,41 @@ function viewMedicacaoHistorico() {
 function viewMedicacaoFolheto(params) {
   const m = getMedicationById(params.id);
   if (!m) return viewMedicacaoCategorias();
+  const nameEsc = (m.name || '').replace(/</g, '&lt;');
+  const dosageEsc = (m.dosage || '-').replace(/</g, '&lt;');
+  const substanceEsc = (m.substance || '-').replace(/</g, '&lt;');
+  const manufacturerEsc = (m.manufacturer || '-').replace(/</g, '&lt;');
+  const posologyEsc = (m.posology || '-').replace(/</g, '&lt;');
+  const indicationEsc = (m.indication || '-').replace(/</g, '&lt;');
   return pageHeader('Folheto informativo', '#medicacao-detalhes?id=' + params.id) +
-    '<main class="app-main prose prose-sm max-w-none bg-white"><h2>' + (m.name || '').replace(/</g, '&lt;') + '</h2><p><strong>Composição:</strong> ' + (m.substance || '-').replace(/</g, '&lt;') + '. Dosagem: ' + (m.dosage || '-').replace(/</g, '&lt;') + '.</p><p>Consulta sempre o folheto da embalagem ou o teu médico/farmacêutico para informações completas.</p></main>';
+    '<main class="app-main bg-white space-y-4">' +
+    '<section class="leaflet-hero">' +
+    '<div>' +
+    '<p class="leaflet-kicker">Folheto</p>' +
+    '<h2 class="leaflet-title">' + nameEsc + '</h2>' +
+    '<p class="leaflet-sub">' + dosageEsc + '</p>' +
+    '</div>' +
+    '<span class="material-icons leaflet-icon">description</span>' +
+    '</section>' +
+    '<section class="leaflet-card">' +
+    '<h3>Composição</h3>' +
+    '<p><strong>Substância ativa:</strong> ' + substanceEsc + '</p>' +
+    '<p><strong>Dosagem:</strong> ' + dosageEsc + '</p>' +
+    '</section>' +
+    '<section class="leaflet-card">' +
+    '<h3>Posologia e indicação</h3>' +
+    '<p><strong>Posologia:</strong> ' + posologyEsc + '</p>' +
+    '<p><strong>Indicação terapêutica:</strong> ' + indicationEsc + '</p>' +
+    '</section>' +
+    '<section class="leaflet-card">' +
+    '<h3>Fabricante</h3>' +
+    '<p>' + manufacturerEsc + '</p>' +
+    '</section>' +
+    '<section class="leaflet-note">' +
+    '<span class="material-icons">info</span>' +
+    '<p>Consulta sempre o folheto da embalagem ou o teu médico/farmacêutico para informações completas.</p>' +
+    '</section>' +
+    '</main>';
 }
 
 function viewChecklistViagem() {
@@ -805,11 +888,26 @@ function viewReciclagemRegistar() {
 
 function viewReciclagemGuia() {
   return pageHeader('Guia de Reciclagem', '#reciclagem') +
-    '<main class="app-main bg-white space-y-3">' +
-    '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">recycling</span></div><div><h3>O que entregar (Valormed)</h3><p>Medicamentos fora de prazo, embalagens vazias, medicamentos veterinários.</p></div></section>' +
-    '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">block</span></div><div><h3>O que não fazer</h3><p>Não deitar nos resíduos indiferenciados nem na sanita.</p></div></section>' +
-    '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">location_on</span></div><div><h3>Onde entregar</h3><p>Farmácias e parafarmácias aderentes.</p></div></section>' +
-    '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">verified_user</span></div><div><h3>Cuidados</h3><p>Entregar embalagens fechadas e retirar dados pessoais.</p></div></section>' +
+    '<main class="app-main bg-white space-y-4">' +
+    '<section class="recycling-guide-hero">' +
+    '<div><p class="guide-kicker">Guia rápido</p><h3 class="guide-title">Como reciclar medicamentos com segurança</h3><p class="guide-sub">Segue estes passos simples para proteger a tua saúde e o ambiente.</p></div>' +
+    '<span class="material-icons guide-hero-icon">recycling</span>' +
+    '</section>' +
+    '<section class="recycling-guide-steps">' +
+    '<div class="guide-step"><div class="guide-step__num">1</div><div><h4>Separa o que vais entregar</h4><p>Medicamentos fora de prazo, sobras, embalagens vazias e medicamentos veterinários.</p></div></div>' +
+    '<div class="guide-step"><div class="guide-step__num">2</div><div><h4>Remove dados pessoais</h4><p>Apaga etiquetas com o teu nome e mantém as embalagens fechadas.</p></div></div>' +
+    '<div class="guide-step"><div class="guide-step__num">3</div><div><h4>Entrega no local certo</h4><p>Leva tudo a uma farmácia ou parafarmácia aderente (Valormed).</p></div></div>' +
+    '</section>' +
+    '<section class="recycling-guide-grid">' +
+    '<div class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">check_circle</span></div><div><h3>O que entregar</h3><p>Blisters, frascos, bisnagas, caixas e folhetos.</p></div></div>' +
+    '<div class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">block</span></div><div><h3>O que não fazer</h3><p>Não deites no lixo comum nem na sanita.</p></div></div>' +
+    '<div class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">location_on</span></div><div><h3>Onde entregar</h3><p>Farmácias e parafarmácias aderentes.</p></div></div>' +
+    '<div class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">verified_user</span></div><div><h3>Cuidados</h3><p>Embalagens fechadas e sem dados pessoais.</p></div></div>' +
+    '</section>' +
+    '<section class="recycling-guide-cta">' +
+    '<a href="#reciclagem-pontos" class="btn-primary w-full">Encontrar pontos de recolha</a>' +
+    '<a href="#reciclagem-registar" class="btn-outline w-full">Registar entrega</a>' +
+    '</section>' +
     '</main>';
 }
 
