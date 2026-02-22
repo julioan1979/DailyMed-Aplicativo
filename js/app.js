@@ -588,6 +588,7 @@ function viewMedicacaoCategorias() {
   list = '<a href="#medicacao-armario" class="block w-full py-3 px-4 rounded-xl bg-primary-container text-black font-medium text-center shadow-sm">Ver todos</a>';
   list += '<a href="#medicacao-armario?filter=ativos" class="block w-full py-3 px-4 rounded-xl bg-primary-container text-black font-medium text-center shadow-sm">Medicação Diária</a>';
   CATEGORIAS.forEach(function (c) {
+    if (c === 'Medicação Diária') return;
     list += '<a href="#medicacao-armario?cat=' + encodeURIComponent(c) + '" class="block w-full py-3 px-4 rounded-xl bg-primary-container text-black font-medium text-center shadow-sm">' + c + '</a>';
   });
   return pageHeader('Armário de Medicamentos', '#home') +
