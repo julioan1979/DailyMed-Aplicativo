@@ -201,7 +201,7 @@ function viewMedicacaoCategorias() {
   return pageHeader('Armário de Medicamentos', '#home') +
     '<main class="p-4 space-y-3 bg-white">' +
     '<button type="button" id="btn-adicionar-medicamento" class="flex items-center gap-3 w-full py-3 px-4 rounded-xl bg-primary text-white font-medium"><span class="material-icons">add_circle_outline</span><span>Adicionar Medicamento</span></button>' +
-    '<a href="#checklist-viagem" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span class="flex items-center gap-3"><span class="material-icons">flight_takeoff</span><span>Checklist de Viagem</span></span><span class="material-icons text-gray-500">chevron_right</span></a>' +
+    '<a href="#checklist-viagem" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span class="flex items-center gap-3"><span class="material-icons">flight_takeoff</span><span>Checklist de Julio</span></span><span class="material-icons text-gray-500">chevron_right</span></a>' +
     '<h3 class="text-base font-bold text-black text-center pt-2">Categorias de Medicamentos</h3>' +
     '<div class="space-y-2">' + list + '</div></main>';
 }
