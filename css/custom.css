@@ -59,6 +59,22 @@
 .dark .bg-gray-200 { background: rgba(255, 255, 255, 0.04) !important; }
 
 body { font-family: 'Manrope', system-ui, -apple-system, sans-serif; background: var(--background); color: var(--on-surface); }
+.header-action {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  background: #f3f4f6;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+}
+.header-action:hover { background: #e5e7eb; }
 .card-round { border-radius: var(--radius-md); }
 .btn-round { border-radius: var(--radius-sm); }
 .input-outline { border: 1px solid rgba(148, 163, 184, 0.7); border-radius: var(--radius-sm); transition: border-color 0.15s, box-shadow 0.15s; background: #ffffff; }

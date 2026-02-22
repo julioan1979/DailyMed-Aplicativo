@@ -380,6 +380,7 @@ function viewHome() {
   const stockLow = meds.filter(function (m) { return (parseInt(m.quantity || 0, 10) || 0) <= 10; }).length;
   return '<header class="relative px-4 flex items-center justify-center gap-3 bg-white">' +
     '<img src="logo.png" alt="DailyMed" class="app-logo object-contain" />' +
+    '<a href="#definicoes" class="header-action" aria-label="Definições"><span class="material-icons">settings</span></a>' +
     '</header>' +
     '<main class="app-main space-y-5 bg-white">' +
     '<div class="grid grid-cols-2 gap-3">' +
@@ -473,18 +474,20 @@ function viewMedicacaoArmario(params) {
       '</div>';
   });
 
-  let filterLinks = '<a href="' + filterBase + '" class="chip ' + (filter === 'todos' ? 'chip--active' : 'chip--ghost') + '">' + (filter === 'todos' ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + 'Todos</a>';
-  filterLinks += '<a href="' + filterBase + (catQs ? '&' : '?') + 'filter=ativos' + '" class="chip ' + (filter === 'ativos' ? 'chip--active' : 'chip--ghost') + '">' + (filter === 'ativos' ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + 'Medicamentos ativos</a>';
-  ['stock', 'expirando', 'expirados', 'baixo'].forEach(function (f) {
-    const label = f === 'stock' ? 'Em stock' : f === 'expirando' ? 'A expirar' : f === 'expirados' ? 'Expirados' : 'Stock baixo';
-    const sep = catQs ? '&' : '?';
-    filterLinks += '<a href="' + filterBase + sep + 'filter=' + f + '" class="chip ' + (filter === f ? 'chip--active' : 'chip--ghost') + '">' + (filter === f ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + label + '</a>';
-  });
-  const semLembretes = getMedications().filter(function (m) {
-    if (!m.isActive) return false;
-    return !getReminders().some(function (r) { return r.isActive && r.medicationId === m.id; });
-  });
-  filterLinks += '<a href="' + filterBase + (catQs ? '&' : '?') + 'filter=semlembretes' + '" class="chip ' + (filter === 'semlembretes' ? 'chip--active' : 'chip--ghost') + '">' + (filter === 'semlembretes' ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + 'Sem lembretes</a>';
+  const filterOptions = [
+    { id: 'todos', label: 'Todos' },
+    { id: 'ativos', label: 'Medicamentos ativos' },
+    { id: 'stock', label: 'Em stock' },
+    { id: 'expirando', label: 'A expirar' },
+    { id: 'expirados', label: 'Expirados' },
+    { id: 'baixo', label: 'Stock baixo' },
+    { id: 'semlembretes', label: 'Sem lembretes' },
+  ];
+  const filterSelect = '<select id="armario-filter" class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white">' +
+    filterOptions.map(function (opt) {
+      return '<option value="' + opt.id + '"' + (filter === opt.id ? ' selected' : '') + '>' + opt.label + '</option>';
+    }).join('') +
+    '</select>';
 
   let banner = '';
   if (detected.length > 0) banner = '<a href="#medicacao-interacoes" class="block p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm"><span class="material-icons align-middle text-lg mr-1">warning</span>Atenção: ' + detected.length + ' interação(ões) detetada(s). Toca para ver.</a>';
@@ -497,7 +500,7 @@ function viewMedicacaoArmario(params) {
     '<a href="#medicacao" class="flex items-center justify-center gap-2 w-full btn-ghost font-medium"><span class="material-icons text-lg">arrow_back</span>Voltar às Categorias</a>' +
     '<input type="search" placeholder="Pesquisar nome ou fabricante..." class="w-full px-4 py-2 rounded-xl border border-gray-200" id="armario-search" value="' + (params.q || '').replace(/"/g, '&quot;') + '" />' +
     '<h3 class="font-bold text-black">Os Meus Medicamentos</h3>' +
-    '<div class="flex flex-wrap gap-2">' + filterLinks + '</div>' +
+    filterSelect +
     '<p class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm bg-gray-100 text-gray-700"><span class="w-2 h-2 rounded-full bg-primary"></span>Medicamentos ativos</p>' +
     (category ? '<p class="text-sm text-on-surface-variant">Categoria: ' + escapeHtml(category) + '</p>' : '') +
     banner +
@@ -756,11 +759,20 @@ function viewLembretesEditar(params) {
 
 function viewReciclagem() {
   const s = recyclingStats();
+  const isEmpty = s.totalPackages === 0;
+  if (isEmpty) {
+    return pageHeader('Reciclagem', null) +
+      '<main class="app-main space-y-4 bg-white">' +
+      '<div class="empty-state">' +
+      '<div class="empty-icon"><span class="material-icons">recycling</span></div>' +
+      '<p>Ainda não existem entregas. Regista a tua primeira entrega para começares.</p>' +
+      '<a href="#reciclagem-registar" class="inline-flex items-center justify-center mt-3 px-4 py-2 btn-primary">Registar entrega</a>' +
+      '</div>' +
+      '<a href="#reciclagem-guia" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span>Guia de Reciclagem</span><span class="material-icons text-gray-500">chevron_right</span></a>' +
+      '</main>';
+  }
   const progressBar = s.nextLevel ? '<div class="mt-3 h-2.5 bg-gray-200 rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full transition-all" style="width:' + Math.min(100, s.progress) + '%"></div></div><p class="text-xs text-on-surface-variant mt-2">Próximo: ' + s.nextLevel.name + ' (' + s.nextLevel.min + ' pts)</p>' : '';
   const milestoneBlock = s.milestoneText ? '<p class="p-3 rounded-xl bg-green-50 text-green-800 text-sm">' + s.milestoneText + '</p>' : '';
-  const emptyBlock = s.totalPackages === 0
-    ? '<div class="empty-state"><div class="empty-icon"><span class="material-icons">recycling</span></div><p>Ainda não existem entregas. Regista a tua primeira entrega para começares.</p><a href="#reciclagem-registar" class="inline-flex items-center justify-center mt-3 px-4 py-2 btn-primary">Registar entrega</a></div>'
-    : '';
   return pageHeader('Reciclagem', null) +
     '<main class="app-main space-y-4 bg-white">' +
     '<div class="grid grid-cols-2 gap-3">' +
@@ -777,7 +789,6 @@ function viewReciclagem() {
     '<p class="text-sm text-green-800 mt-2">Já evitou o descarte incorreto de <strong>' + s.totalPackages + '</strong> embalagens.</p>' +
     '</div>' +
     milestoneBlock +
-    emptyBlock +
     '<div class="space-y-2">' +
     '<a href="#reciclagem-registar" class="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl btn-primary font-medium"><span class="material-icons">add_circle_outline</span><span>Registar Entrega</span></a>' +
     '<a href="#reciclagem-guia" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span>Guia de Reciclagem</span><span class="material-icons text-gray-500">chevron_right</span></a>' +
@@ -860,14 +871,9 @@ function viewDicasArtigo(params) {
     '<main class="app-main bg-white"><img src="' + a.image + '" alt="" class="w-full -mt-2 rounded-t-xl object-cover h-48" /><div class="p-4 -mt-2 rounded-t-2xl"><span class="text-xs text-primary font-medium">' + a.category + '</span><p class="text-sm text-on-surface-variant">' + a.publishedAt + ' · ' + a.readTime + ' min</p><h1 class="text-xl font-bold mt-2 text-black">' + a.title.replace(/</g, '&lt;') + '</h1><div class="prose prose-sm mt-4 max-w-none">' + body + '</div></div></main>';
 }
 
-function viewPerfil() {
-  return pageHeader('Perfil', '#home') +
-    '<main class="app-main bg-white"><p class="text-on-surface-variant">Informações do utilizador.</p><a href="#definicoes" class="flex items-center justify-between mt-4 py-3 px-4 rounded-xl bg-primary-container text-black font-medium"><span>Definições</span><span class="material-icons text-gray-500">chevron_right</span></a></main>';
-}
-
 function viewDefinicoes() {
   const s = getSettings();
-  return pageHeader('Definições', '#perfil') +
+  return pageHeader('Definições', '#home') +
     '<main class="app-main space-y-4 bg-white"><div class="flex items-center justify-between p-4 rounded-xl border border-gray-200"><span class="font-medium text-black">Notificações</span><input type="checkbox" id="setting-notifications" ' + (s.notifications ? 'checked' : '') + ' class="rounded" /></div><div class="flex items-center justify-between p-4 rounded-xl border border-gray-200"><span class="font-medium text-black">Tema</span><select id="setting-theme" class="px-3 py-2 rounded-lg border border-gray-200"><option value="light"' + (s.theme === 'light' ? ' selected' : '') + '>Claro</option><option value="dark"' + (s.theme === 'dark' ? ' selected' : '') + '>Escuro</option></select></div></main>';
 }
 
@@ -895,7 +901,6 @@ const ROUTES = {
   'reciclagem-historico': viewReciclagemHistorico,
   dicas: viewDicas,
   'dicas-artigo': viewDicasArtigo,
-  perfil: viewPerfil,
   definicoes: viewDefinicoes,
 };
 
@@ -929,6 +934,15 @@ function afterRender(path, params) {
       var q = armarioSearch.value.trim();
       var np = { filter: currentParams.filter, cat: currentParams.cat };
       if (q) np.q = q;
+      navigate('medicacao-armario', np);
+    });
+  }
+  var armarioFilter = document.getElementById('armario-filter');
+  if (armarioFilter) {
+    var currentParamsFilter = parseHash().params;
+    armarioFilter.addEventListener('change', function () {
+      var np = { cat: currentParamsFilter.cat, filter: armarioFilter.value };
+      if (currentParamsFilter.q) np.q = currentParamsFilter.q;
       navigate('medicacao-armario', np);
     });
   }
@@ -1063,8 +1077,7 @@ function afterRender(path, params) {
   document.querySelectorAll('.med-card-detail').forEach(function (el) {
     el.addEventListener('click', function () {
       var id = el.dataset.id;
-      var m = getMedicationById(id);
-      if (m) showMedicationDetailModal(m);
+      if (id) navigate('medicacao-detalhes', { id: id });
     });
     el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); } });
   });
