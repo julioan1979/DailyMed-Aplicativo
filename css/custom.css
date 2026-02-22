@@ -322,6 +322,22 @@ body { font-family: 'Manrope', system-ui, -apple-system, sans-serif; background:
   flex-direction: column;
   gap: 8px;
 }
+.dicas-featured__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.dicas-featured__badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #111827;
+  background: #facc15;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
 .dicas-featured__body h3 {
   font-size: 1.05rem;
   font-weight: 700;

@@ -967,9 +967,19 @@ function viewReciclagemHistorico() {
     '<main class="app-main bg-white">' + listHtml + '</main>';
 }
 
+function getLastReadDicaId() {
+  try { return localStorage.getItem('dailymed_last_dica') || ''; } catch (e) { return ''; }
+}
+
+function setLastReadDicaId(id) {
+  try { if (id) localStorage.setItem('dailymed_last_dica', id); } catch (e) {}
+}
+
 function viewDicas() {
-  const featured = DICAS_ARTIGOS[0];
-  const cards = DICAS_ARTIGOS.map(function (a) {
+  const lastId = getLastReadDicaId();
+  const featured = DICAS_ARTIGOS.find(function (a) { return a.id === lastId; }) || DICAS_ARTIGOS[0];
+  const list = featured ? DICAS_ARTIGOS.filter(function (a) { return a.id !== featured.id; }) : DICAS_ARTIGOS;
+  const cards = list.map(function (a) {
     return '<a href="#dicas-artigo?id=' + a.id + '" class="dicas-card">' +
       '<div class="dicas-card__media"><img src="' + a.image + '" alt="" /></div>' +
       '<div class="dicas-card__body">' +
@@ -999,7 +1009,10 @@ function viewDicas() {
       '<a href="#dicas-artigo?id=' + featured.id + '" class="dicas-featured__card">' +
       '<div class="dicas-featured__media"><img src="' + featured.image + '" alt="" /></div>' +
       '<div class="dicas-featured__body">' +
+      '<div class="dicas-featured__meta">' +
       '<span class="dicas-chip dicas-chip--light">' + escapeHtml(featured.category) + '</span>' +
+      '<span class="dicas-featured__badge">Último lido</span>' +
+      '</div>' +
       '<h3>' + escapeHtml(featured.title) + '</h3>' +
       '<p>' + featured.readTime + ' min de leitura</p>' +
       '</div>' +
@@ -1012,6 +1025,7 @@ function viewDicas() {
 function viewDicasArtigo(params) {
   const a = DICAS_ARTIGOS.find(function (x) { return x.id === params.id; });
   if (!a) return viewDicas();
+  setLastReadDicaId(a.id);
   const paragraphs = a.text.split(/\n\n+/).filter(Boolean);
   const body = paragraphs.map(function (p) { return '<p>' + escapeHtml(p) + '</p>'; }).join('');
   return pageHeader('', '#dicas') +
