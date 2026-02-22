@@ -3,7 +3,7 @@
  */
 
 const CATEGORIAS = [
-  'Diarreia', 'Dores de Cabeça', 'Dores Musculares', 'Estômago', 'Febre', 'Garganta',
+  'Medicação Diária', 'Diarreia', 'Dores de Cabeça', 'Dores Musculares', 'Estômago', 'Febre', 'Garganta',
   'Gripes e Constipações', 'Insónias', 'Irritação Ocular', 'Pele', 'Tosse', 'Vitaminas', 'Vómitos',
 ];
 
@@ -534,15 +534,17 @@ function viewHome() {
     '<img src="logo.png" alt="DailyMed" class="app-logo object-contain" />' +
     '<a href="#definicoes" class="header-action" aria-label="Definições"><span class="material-icons">settings</span></a>' +
     '</header>' +
-    '<main class="app-main space-y-5 bg-white">' +
+    '<main class="app-main space-y-6 bg-white">' +
     '<section class="next-step-card" aria-live="polite">' +
+    '<p class="next-step-label">Agora</p>' +
     '<p class="next-step-text">' + nextLabel + '</p>' +
     (nextReminder ? '<a href="#lembretes" class="next-step-cta">Ver lembretes</a>' : '') +
     '</section>' +
-    '<section class="space-y-2">' +
-    '<div class="grid grid-cols-1 gap-3">' +
-    '<a href="#lembretes" class="home-shortcut home-shortcut--primary"><span class="material-icons text-2xl">schedule</span><span>Lembretes</span></a>' +
-    '<a href="#medicacao" class="home-shortcut home-shortcut--secondary"><span class="material-icons text-2xl">medication</span><span>Armário</span></a>' +
+    '<section class="home-secondary-footer space-y-2">' +
+    '<p class="section-label">Configurações</p>' +
+    '<div class="grid grid-cols-1 gap-2">' +
+    '<a href="#medicacao" class="home-shortcut home-shortcut--secondary home-shortcut--compact"><span class="material-icons text-2xl">medication</span><span>Armário</span></a>' +
+    '<a href="#reciclagem" class="home-shortcut home-shortcut--secondary home-shortcut--compact"><span class="material-icons text-2xl">recycling</span><span>Reciclar</span></a>' +
     '</div>' +
     '</section>' +
     '<section class="space-y-2">' +
