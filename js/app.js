@@ -227,6 +227,24 @@ let reminderTimers = [];
 let medicationAlertTimer = null;
 let dailyRescheduleTimer = null;
 let reminderSweepTimer = null;
+let recyclingMapState = { map: null, mapEl: null, abortController: null, active: false };
+
+function teardownRecyclingMap() {
+  if (!recyclingMapState.active) return;
+  recyclingMapState.active = false;
+  if (recyclingMapState.abortController) {
+    try { recyclingMapState.abortController.abort(); } catch (e) {}
+  }
+  if (recyclingMapState.map) {
+    try { recyclingMapState.map.remove(); } catch (e) {}
+  }
+  if (recyclingMapState.mapEl && recyclingMapState.mapEl._leaflet_id) {
+    try { delete recyclingMapState.mapEl._leaflet_id; } catch (e) {}
+  }
+  recyclingMapState.map = null;
+  recyclingMapState.mapEl = null;
+  recyclingMapState.abortController = null;
+}
 
 function clearReminderTimers() {
   reminderTimers.forEach(function (t) { clearTimeout(t); });
@@ -1227,6 +1245,9 @@ function pageHeader(title, backHref) {
 function runRoute() {
   const parsed = parseHash();
   const pathNorm = parsed.path || 'home';
+  if (currentView === 'reciclagem-pontos' && pathNorm !== 'reciclagem-pontos') {
+    teardownRecyclingMap();
+  }
   currentView = pathNorm;
   const fn = ROUTES[pathNorm] || ROUTES.home;
   const showNav = ['home', 'medicacao', 'lembretes', 'reciclagem', 'dicas'].indexOf(pathNorm.split('-')[0]) >= 0;
@@ -1785,8 +1806,12 @@ function initRecyclingMap() {
   var mapEl = document.getElementById('recycling-map');
   if (!mapEl || typeof L === 'undefined') return;
   if (mapEl._leaflet_id) return;
+  recyclingMapState.active = true;
+  recyclingMapState.mapEl = mapEl;
+  recyclingMapState.abortController = new AbortController();
   var fallbackCenter = [38.7223, -9.1393];
   var map = L.map(mapEl).setView(fallbackCenter, 13);
+  recyclingMapState.map = map;
   var statusEl = document.getElementById('map-status');
   var listEl = document.getElementById('map-points-list');
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1868,7 +1893,7 @@ function initRecyclingMap() {
   function geocodeAddress(address) {
     if (!address) return Promise.resolve(null);
     var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=0&q=' + encodeURIComponent(address);
-    return fetch(url, { headers: { 'Accept-Language': 'pt-PT' } })
+    return fetch(url, { headers: { 'Accept-Language': 'pt-PT' }, signal: recyclingMapState.abortController.signal })
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (!Array.isArray(data) || !data.length) return null;
@@ -1900,6 +1925,7 @@ function initRecyclingMap() {
 
   async function geocodeAllPoints() {
     if (geocodeAllPoints._done) return;
+    if (!recyclingMapState.active) return;
     setStatus('A localizar pontos…');
     var updated = false;
     RECYCLING_POINTS.forEach(function (p) {
@@ -1919,11 +1945,13 @@ function initRecyclingMap() {
       return;
     }
     for (var i = 0; i < RECYCLING_POINTS.length; i += 1) {
+      if (!recyclingMapState.active) return;
       var p = RECYCLING_POINTS[i];
       if (!p.address) continue;
       if (typeof p.lat === 'number' && typeof p.lng === 'number') continue;
       var cached = getCachedCoords(p.address);
       var coords = cached || await geocodeAddress(p.address);
+      if (!recyclingMapState.active) return;
       if (coords && !Number.isNaN(coords.lat) && !Number.isNaN(coords.lng)) {
         p.lat = coords.lat;
         p.lng = coords.lng;
@@ -1973,15 +2001,18 @@ function initRecyclingMap() {
   }
 
   renderAll(RECYCLING_POINTS);
-  setStatus('Localização não permitida.');
-  geocodeAllPoints().then(function () {
-    renderAll(RECYCLING_POINTS);
-  });
+  setStatus('Ativa a localização ou atualiza para calcular distâncias.');
 
   var btnLoc = document.getElementById('btn-use-location');
-  if (btnLoc) btnLoc.addEventListener('click', function () { requestLocation(false); });
+  if (btnLoc) btnLoc.addEventListener('click', function () {
+    geocodeAllPoints();
+    requestLocation(false);
+  });
   var btnRefresh = document.getElementById('btn-refresh-location');
-  if (btnRefresh) btnRefresh.addEventListener('click', function () { requestLocation(true); });
+  if (btnRefresh) btnRefresh.addEventListener('click', function () {
+    geocodeAllPoints();
+    requestLocation(true);
+  });
 
   document.querySelectorAll('.map-radius').forEach(function (btn) {
     btn.addEventListener('click', function () {
