@@ -148,6 +148,73 @@ function recyclingStats() {
 }
 
 let currentView = '';
+let reminderTimers = [];
+
+function clearReminderTimers() {
+  reminderTimers.forEach(function (t) { clearTimeout(t); });
+  reminderTimers = [];
+}
+
+function showToast(message) {
+  if (!message) return;
+  var existing = document.getElementById('toast-reminder');
+  if (existing) existing.remove();
+  var html = '<div id="toast-reminder" class="toast-reminder">' +
+    '<span class="material-icons">notifications</span>' +
+    '<div class="toast-reminder__text">' + message.replace(/</g, '&lt;') + '</div>' +
+    '</div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+  setTimeout(function () {
+    var el = document.getElementById('toast-reminder');
+    if (el) el.classList.add('toast-reminder--hide');
+  }, 3500);
+  setTimeout(function () {
+    var el = document.getElementById('toast-reminder');
+    if (el) el.remove();
+  }, 5000);
+}
+
+function scheduleReminderNotifications() {
+  clearReminderTimers();
+  var settings = getSettings();
+  var today = todayStr();
+  var now = new Date();
+  var reminders = getReminders().filter(function (r) { return r.isActive; });
+  reminders.forEach(function (r) {
+    var startOk = !r.startDate || today >= r.startDate;
+    var endOk = !r.endDate || today <= r.endDate;
+    if (!startOk || !endOk) return;
+    var times = Array.isArray(r.times) && r.times.length ? r.times : (r.time ? [r.time] : []);
+    var notifiedTimes = (r.lastNotifiedDate === today && Array.isArray(r.lastNotifiedTimes)) ? r.lastNotifiedTimes : [];
+    times.forEach(function (t) {
+      if (!t) return;
+      if (notifiedTimes.indexOf(t) !== -1) return;
+      var parts = t.split(':');
+      var hh = parseInt(parts[0] || '0', 10);
+      var mm = parseInt(parts[1] || '0', 10);
+      var fireAt = new Date();
+      fireAt.setHours(hh, mm, 0, 0);
+      if (fireAt <= now) return;
+      var delay = fireAt.getTime() - now.getTime();
+      var timer = setTimeout(function () {
+        if (!getSettings().notifications) return;
+        var med = getMedicationById(r.medicationId);
+        var msg = 'Hora de tomar ' + (med ? med.name : 'o seu medicamento') + '.';
+        showToast(msg);
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          try { new Notification('Lembrete DailyMed', { body: msg }); } catch (e) {}
+        }
+        var latest = getReminderById(r.id);
+        if (!latest) return;
+        latest.lastNotifiedDate = today;
+        latest.lastNotifiedTimes = Array.isArray(latest.lastNotifiedTimes) ? latest.lastNotifiedTimes.slice() : [];
+        if (latest.lastNotifiedTimes.indexOf(t) === -1) latest.lastNotifiedTimes.push(t);
+        saveReminder(latest);
+      }, delay);
+      reminderTimers.push(timer);
+    });
+  });
+}
 
 function setNavActive(section) {
   document.querySelectorAll('#bottom-nav .nav-link').forEach(function (a) {
@@ -201,7 +268,6 @@ function viewMedicacaoCategorias() {
   return pageHeader('Armário de Medicamentos', '#home') +
     '<main class="p-4 space-y-3 bg-white">' +
     '<button type="button" id="btn-adicionar-medicamento" class="flex items-center gap-3 w-full py-3 px-4 rounded-xl bg-primary text-white font-medium"><span class="material-icons">add_circle_outline</span><span>Adicionar Medicamento</span></button>' +
-    '<a href="#checklist-viagem" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span class="flex items-center gap-3"><span class="material-icons">flight_takeoff</span><span>Checklist de Julio</span></span><span class="material-icons text-gray-500">chevron_right</span></a>' +
     '<h3 class="text-base font-bold text-black text-center pt-2">Categorias de Medicamentos</h3>' +
     '<div class="space-y-2">' + list + '</div></main>';
 }
@@ -518,10 +584,31 @@ function viewLembretesEditar(params) {
 
 function viewReciclagem() {
   const s = recyclingStats();
-  const progressBar = s.nextLevel ? '<div class="mt-2 h-2 bg-gray-200 rounded overflow-hidden"><div class="h-full bg-primary rounded" style="width:' + Math.min(100, s.progress) + '%"></div></div><p class="text-xs text-on-surface-variant mt-1">Próximo: ' + s.nextLevel.name + ' (' + s.nextLevel.min + ' pts)</p>' : '';
+  const progressBar = s.nextLevel ? '<div class="mt-3 h-2.5 bg-gray-200 rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full transition-all" style="width:' + Math.min(100, s.progress) + '%"></div></div><p class="text-xs text-on-surface-variant mt-2">Próximo: ' + s.nextLevel.name + ' (' + s.nextLevel.min + ' pts)</p>' : '';
   const milestoneBlock = s.milestoneText ? '<p class="p-3 rounded-xl bg-green-50 text-green-800 text-sm">' + s.milestoneText + '</p>' : '';
   return pageHeader('Reciclagem', null) +
-    '<main class="p-4 space-y-4 bg-white"><div class="grid grid-cols-2 gap-3"><div class="rounded-2xl p-4 bg-primary-container"><p class="text-sm text-black">Embalagens recicladas</p><p class="text-2xl font-bold text-primary">' + s.totalPackages + '</p></div><div class="rounded-2xl p-4 bg-secondary-container"><p class="text-sm text-black">Unidades verdes</p><p class="text-2xl font-bold text-secondary">' + s.greenUnits + '</p></div></div><div class="rounded-2xl p-4 border border-gray-200"><p class="text-sm text-black">Pontos</p><p class="text-2xl font-bold">' + s.points + '</p><p class="text-sm mt-1">Nível: ' + s.level.name + '</p>' + progressBar + '</div>' + milestoneBlock + '<div class="space-y-2"><a href="#reciclagem-registar" class="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl bg-primary text-white font-medium"><span class="material-icons">add_circle_outline</span><span>Registar Entrega</span></a><a href="#reciclagem-guia" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span>Guia de Reciclagem</span><span class="material-icons text-gray-500">chevron_right</span></a><a href="#reciclagem-pontos" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span>Localizador de Pontos</span><span class="material-icons text-gray-500">chevron_right</span></a><a href="#reciclagem-historico" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-primary-container text-black font-medium"><span>Histórico</span><span class="material-icons text-gray-500">chevron_right</span></a></div></main>';
+    '<main class="p-4 space-y-4 bg-white">' +
+    '<div class="grid grid-cols-2 gap-3">' +
+    '<div class="rounded-2xl p-4 bg-primary-container shadow-sm border border-gray-100"><p class="text-sm text-black">Embalagens recicladas</p><p class="text-2xl font-bold text-primary">' + s.totalPackages + '</p></div>' +
+    '<div class="rounded-2xl p-4 bg-secondary-container shadow-sm border border-gray-100"><p class="text-sm text-black">Unidades verdes</p><p class="text-2xl font-bold text-secondary">' + s.greenUnits + '</p></div>' +
+    '</div>' +
+    '<div class="rounded-2xl p-4 border border-gray-200 bg-white shadow-sm">' +
+    '<div class="flex items-center justify-between">' +
+    '<div><p class="text-sm text-black">Pontos</p><p class="text-2xl font-bold">' + s.points + '</p></div>' +
+    '<div class="text-right"><p class="text-xs text-on-surface-variant">Nível atual</p><p class="text-sm font-semibold text-green-700">' + s.level.name + '</p></div>' +
+    '</div>' + progressBar + '</div>' +
+    '<div class="eco-summary rounded-2xl p-4">' +
+    '<div class="flex items-center gap-2"><span class="material-icons text-green-700">eco</span><p class="font-medium text-green-900">Resumo ecológico</p></div>' +
+    '<p class="text-sm text-green-800 mt-2">Já evitou o descarte incorreto de <strong>' + s.totalPackages + '</strong> embalagens.</p>' +
+    '</div>' +
+    milestoneBlock +
+    '<div class="space-y-2">' +
+    '<a href="#reciclagem-registar" class="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl bg-primary text-white font-medium"><span class="material-icons">add_circle_outline</span><span>Registar Entrega</span></a>' +
+    '<a href="#reciclagem-guia" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span>Guia de Reciclagem</span><span class="material-icons text-gray-500">chevron_right</span></a>' +
+    '<a href="#reciclagem-pontos" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span>Localizador de Pontos</span><span class="material-icons text-gray-500">chevron_right</span></a>' +
+    '<a href="#reciclagem-historico" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-primary-container text-black font-medium"><span>Histórico</span><span class="material-icons text-gray-500">chevron_right</span></a>' +
+    '</div>' +
+    '</main>';
 }
 
 function viewReciclagemRegistar() {
@@ -531,7 +618,12 @@ function viewReciclagemRegistar() {
 
 function viewReciclagemGuia() {
   return pageHeader('Guia de Reciclagem', '#reciclagem') +
-    '<main class="p-4 prose prose-sm max-w-none bg-white"><h2>O que entregar (Valormed)</h2><p>Medicamentos fora de prazo, embalagens vazias, medicamentos veterinários.</p><h2>O que não fazer</h2><p>Não deitar no lixo comum nem na sanita.</p><h2>Onde entregar</h2><p>Farmácias e parafarmácias aderentes.</p><h2>Cuidados</h2><p>Entregar embalagens fechadas e retirar dados pessoais.</p></main>';
+    '<main class="p-4 bg-white space-y-3">' +
+    '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">recycling</span></div><div><h3>O que entregar (Valormed)</h3><p>Medicamentos fora de prazo, embalagens vazias, medicamentos veterinários.</p></div></section>' +
+    '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">block</span></div><div><h3>O que não fazer</h3><p>Não deitar no lixo comum nem na sanita.</p></div></section>' +
+    '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">location_on</span></div><div><h3>Onde entregar</h3><p>Farmácias e parafarmácias aderentes.</p></div></section>' +
+    '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">verified_user</span></div><div><h3>Cuidados</h3><p>Entregar embalagens fechadas e retirar dados pessoais.</p></div></section>' +
+    '</main>';
 }
 
 function viewReciclagemPontos() {
@@ -558,7 +650,9 @@ function viewReciclagemHistorico() {
 function viewDicas() {
   const cards = DICAS_ARTIGOS.map(function (a) { return '<a href="#dicas-artigo?id=' + a.id + '" class="block rounded-xl border border-outline overflow-hidden card-round bg-surface"><img src="' + a.image + '" alt="" class="w-full h-40 object-cover" /><div class="p-4"><span class="text-xs text-primary font-medium">' + a.category + '</span><h2 class="font-bold mt-1">' + a.title.replace(/</g, '&lt;') + '</h2><p class="text-sm text-on-surface-variant">' + a.readTime + ' min de leitura</p></div></a>'; }).join('');
   return pageHeader('Dicas de Saúde', null) +
-    '<main class="p-4 bg-white"><div class="grid gap-4">' + cards + '</div></main>';
+    '<main class="p-4 bg-white"><div class="grid gap-4">' +
+    '<a href="#checklist-viagem" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span class="flex items-center gap-3"><span class="material-icons">flight_takeoff</span><span>Checklist de Viagem</span></span><span class="material-icons text-gray-500">chevron_right</span></a>' +
+    cards + '</div></main>';
 }
 
 function viewDicasArtigo(params) {
@@ -931,8 +1025,11 @@ function afterRender(path, params) {
         times: times,
         isActive: true,
         lastTakenDate: null,
+        lastNotifiedDate: null,
+        lastNotifiedTimes: [],
       };
       saveReminder(rem);
+      scheduleReminderNotifications();
       navigate('lembretes');
     });
   }
@@ -966,6 +1063,7 @@ function afterRender(path, params) {
       r.time = timesEdit[0];
       r.times = timesEdit;
       saveReminder(r);
+      scheduleReminderNotifications();
       navigate('lembretes');
     });
   }
@@ -1034,6 +1132,7 @@ function afterRender(path, params) {
     btn.addEventListener('click', function () {
       var r = getReminderById(btn.dataset.id);
       if (r) { r.isActive = false; saveReminder(r); }
+      scheduleReminderNotifications();
       runRoute();
     });
   });
@@ -1095,6 +1194,7 @@ function afterRender(path, params) {
     notifCheck.addEventListener('change', function () {
       setSettings({ notifications: notifCheck.checked });
       if (notifCheck.checked && typeof Notification !== 'undefined' && Notification.permission === 'default') Notification.requestPermission();
+      scheduleReminderNotifications();
     });
   }
   var themeSelect = document.getElementById('setting-theme');
@@ -1202,6 +1302,7 @@ function init() {
       showAddMedicationModal();
     }
   });
+  scheduleReminderNotifications();
   runRoute();
 }
 
