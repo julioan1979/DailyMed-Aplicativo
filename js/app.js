@@ -147,6 +147,18 @@ function recyclingStats() {
   return { totalPackages: totalPackages, greenUnits: greenUnits, points: points, level: level, nextLevel: nextLevel, progress: progress, milestoneText: milestoneText };
 }
 
+function haversineKm(lat1, lon1, lat2, lon2) {
+  var toRad = function (v) { return (v * Math.PI) / 180; };
+  var R = 6371;
+  var dLat = toRad(lat2 - lat1);
+  var dLon = toRad(lon2 - lon1);
+  var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 let currentView = '';
 let reminderTimers = [];
 
@@ -664,9 +676,29 @@ function viewReciclagemGuia() {
 }
 
 function viewReciclagemPontos() {
-  const pointsHtml = RECYCLING_POINTS.map(function (p, i) { return '<li><a href="#reciclagem-ponto?id=' + i + '" class="block p-4 app-card"><div class="flex items-start gap-3"><span class="material-icons text-primary">location_on</span><div><p class="font-medium">' + p.name + '</p><p class="text-sm text-on-surface-variant">' + p.address + '</p><p class="text-sm flex items-center gap-1"><span class="material-icons text-sm">straighten</span> ' + p.distance + '</p></div></div></a></li>'; }).join('');
+  const pointsHtml = RECYCLING_POINTS.map(function (p, i) {
+    var distLabel = p.distanceCalc || '—';
+    return '<li><button type="button" class="block w-full text-left p-4 app-card map-point-item" data-idx="' + i + '">' +
+      '<div class="flex items-start gap-3"><span class="material-icons text-primary">location_on</span>' +
+      '<div><p class="font-medium">' + p.name + '</p>' +
+      '<p class="text-sm text-on-surface-variant">' + p.address + '</p>' +
+      '<p class="text-sm flex items-center gap-1"><span class="material-icons text-sm">straighten</span> ' + distLabel + '</p></div></div></button></li>';
+  }).join('');
   return pageHeader('Localizador de Pontos', '#reciclagem') +
-    '<main class="p-4 bg-white"><ul class="space-y-3">' + pointsHtml + '</ul></main>';
+    '<main class="p-4 bg-white space-y-4">' +
+    '<div class="flex items-center justify-between gap-2">' +
+    '<div class="flex items-center gap-2">' +
+    '<button type="button" id="btn-use-location" class="btn-primary px-4 py-2 rounded-xl flex items-center gap-2"><span class="material-icons">my_location</span><span>Usar a minha localização</span></button>' +
+    '<button type="button" id="btn-refresh-location" class="btn-outline px-4 py-2 rounded-xl flex items-center gap-2"><span class="material-icons">refresh</span><span>Atualizar localização</span></button>' +
+    '</div>' +
+    '<div id="map-status" class="text-xs text-on-surface-variant"></div>' +
+    '</div>' +
+    '<div class="flex flex-wrap gap-2">' +
+    '<button type="button" class="chip chip--active map-radius" data-radius="all">Todas</button>' +
+    '<button type="button" class="chip chip--ghost map-radius" data-radius="5">Até 5 km</button>' +
+    '</div>' +
+    '<div id="recycling-map" class="map-card" aria-label="Mapa de pontos de recolha"></div>' +
+    '<ul class="space-y-3" id="map-points-list">' + pointsHtml + '</ul></main>';
 }
 
 function viewReciclagemPonto(params) {
@@ -760,6 +792,7 @@ function runRoute() {
 
 function afterRender(path, params) {
   setupFab();
+  if (path === 'reciclagem-pontos') initRecyclingMap();
 
   var armarioSearch = document.getElementById('armario-search');
   if (armarioSearch) {
@@ -1248,6 +1281,188 @@ function afterRender(path, params) {
       document.getElementById('body-theme').classList.toggle('dark', themeSelect.value === 'dark');
     });
   }
+}
+
+function initRecyclingMap() {
+  var mapEl = document.getElementById('recycling-map');
+  if (!mapEl || typeof L === 'undefined') return;
+  if (mapEl._leaflet_id) return;
+  var fallbackCenter = [38.7223, -9.1393];
+  var map = L.map(mapEl).setView(fallbackCenter, 13);
+  var statusEl = document.getElementById('map-status');
+  var listEl = document.getElementById('map-points-list');
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap',
+  }).addTo(map);
+  var markers = [];
+
+  function renderMarkers(points) {
+    markers.forEach(function (m) { map.removeLayer(m); });
+    markers = [];
+    points.forEach(function (p, idx) {
+      if (typeof p.lat !== 'number' || typeof p.lng !== 'number') return;
+      var m = L.marker([p.lat, p.lng], { title: p.name }).addTo(map).bindPopup(p.name);
+      m.on('click', function () { highlightListItem(idx); });
+      markers.push(m);
+    });
+  }
+
+  function highlightListItem(idx) {
+    if (!listEl) return;
+    listEl.querySelectorAll('.map-point-item').forEach(function (el) {
+      el.classList.toggle('is-active', el.dataset.idx === String(idx));
+    });
+  }
+
+  function updateList(points) {
+    if (!listEl) return;
+    var hasDistances = points.some(function (p) { return !!p.distanceCalc && p.distanceCalc !== '—'; });
+    var nearestIdx = -1;
+    if (hasDistances) {
+      for (var i = 0; i < points.length; i += 1) {
+        if (typeof points[i]._dist === 'number') { nearestIdx = i; break; }
+      }
+    }
+    listEl.innerHTML = points.map(function (p, i) {
+      var distLabel = hasDistances ? (p.distanceCalc || '—') : 'Ativar localização';
+      var badge = (i === nearestIdx) ? '<span class="nearest-badge">Mais perto</span>' : '';
+      return '<li><button type="button" class="block w-full text-left p-4 app-card map-point-item" data-idx="' + i + '">' +
+        '<div class="flex items-start gap-3"><span class="material-icons text-primary">location_on</span>' +
+        '<div><p class="font-medium">' + p.name + '</p>' +
+        '<p class="text-sm text-on-surface-variant">' + p.address + '</p>' +
+        '<div class="flex items-center gap-2 mt-1">' + badge + '<p class="text-sm flex items-center gap-1"><span class="material-icons text-sm">straighten</span> ' + distLabel + '</p></div></div></div></button></li>';
+    }).join('');
+    listEl.querySelectorAll('.map-point-item').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = parseInt(btn.dataset.idx, 10);
+        var p = points[idx];
+        if (p && typeof p.lat === 'number' && typeof p.lng === 'number') {
+          map.setView([p.lat, p.lng], 15);
+          if (markers[idx]) markers[idx].openPopup();
+        }
+        highlightListItem(idx);
+      });
+    });
+  }
+
+  function applyFilter(points, radiusKm) {
+    var items = points.slice();
+    if (radiusKm && radiusKm !== 'all') {
+      items = items.filter(function (p) { return typeof p._dist === 'number' && p._dist <= radiusKm; });
+    }
+    return items;
+  }
+
+  function renderAll(points) {
+    updateList(points);
+    renderMarkers(points);
+  }
+
+  function setStatus(text) {
+    if (statusEl) statusEl.textContent = text || '';
+  }
+
+  function sleep(ms) {
+    return new Promise(function (res) { setTimeout(res, ms); });
+  }
+
+  function geocodeAddress(address) {
+    var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(address);
+    return fetch(url, { headers: { 'Accept-Language': 'pt-PT' } })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!Array.isArray(data) || !data.length) return null;
+        var first = data[0];
+        return { lat: parseFloat(first.lat), lng: parseFloat(first.lon) };
+      })
+      .catch(function () { return null; });
+  }
+
+  async function geocodeAllPoints() {
+    setStatus('A localizar pontos…');
+    for (var i = 0; i < RECYCLING_POINTS.length; i += 1) {
+      var p = RECYCLING_POINTS[i];
+      if (!p.address) continue;
+      var coords = await geocodeAddress(p.address);
+      if (coords && !Number.isNaN(coords.lat) && !Number.isNaN(coords.lng)) {
+        p.lat = coords.lat;
+        p.lng = coords.lng;
+      }
+      await sleep(1000);
+    }
+    setStatus('');
+  }
+
+  function requestLocation(showBusy) {
+    if (!navigator.geolocation) {
+      setStatus('Localização indisponível.');
+      return;
+    }
+    setStatus(showBusy ? 'A atualizar…' : 'A obter localização…');
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      var lat = pos.coords.latitude;
+      var lng = pos.coords.longitude;
+      var sorted = RECYCLING_POINTS.slice().map(function (p) {
+        var dist = (typeof p.lat === 'number' && typeof p.lng === 'number')
+          ? haversineKm(lat, lng, p.lat, p.lng)
+          : null;
+        var pretty = (dist != null) ? dist.toFixed(1) + ' km' : '—';
+        return Object.assign({}, p, { distanceCalc: pretty, _dist: dist });
+      }).sort(function (a, b) {
+        if (a._dist == null) return 1;
+        if (b._dist == null) return -1;
+        return a._dist - b._dist;
+      });
+      setStatus('');
+      map.setView([lat, lng], 13);
+      L.circleMarker([lat, lng], { radius: 6, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.6 }).addTo(map).bindPopup('A tua localização');
+      var radiusSel = document.querySelector('.map-radius.chip--active')?.dataset.radius || 'all';
+      var radiusVal = radiusSel === 'all' ? 'all' : parseFloat(radiusSel);
+      var filtered = applyFilter(sorted, radiusVal);
+      renderAll(filtered);
+    }, function () {
+      setStatus('Localização não permitida.');
+      showToast('Não foi possível obter a localização', 'warning');
+      map.setView(fallbackCenter, 13);
+      var radiusSel = document.querySelector('.map-radius.chip--active')?.dataset.radius || 'all';
+      var radiusVal = radiusSel === 'all' ? 'all' : parseFloat(radiusSel);
+      renderAll(applyFilter(RECYCLING_POINTS, radiusVal));
+    }, { enableHighAccuracy: true, timeout: 5000 });
+  }
+
+  renderAll(RECYCLING_POINTS);
+  setStatus('Localização não permitida.');
+  geocodeAllPoints().then(function () {
+    renderAll(RECYCLING_POINTS);
+  });
+
+  var btnLoc = document.getElementById('btn-use-location');
+  if (btnLoc) btnLoc.addEventListener('click', function () { requestLocation(false); });
+  var btnRefresh = document.getElementById('btn-refresh-location');
+  if (btnRefresh) btnRefresh.addEventListener('click', function () { requestLocation(true); });
+
+  document.querySelectorAll('.map-radius').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.map-radius').forEach(function (b) {
+        b.classList.remove('chip--active');
+        b.classList.add('chip--ghost');
+      });
+      btn.classList.add('chip--active');
+      btn.classList.remove('chip--ghost');
+      var radiusSel = btn.dataset.radius || 'all';
+      var radiusVal = radiusSel === 'all' ? 'all' : parseFloat(radiusSel);
+      var points = RECYCLING_POINTS;
+      if (points.some(function (p) { return p._dist != null; })) {
+        points = points.slice().sort(function (a, b) {
+          if (a._dist == null) return 1;
+          if (b._dist == null) return -1;
+          return a._dist - b._dist;
+        });
+      }
+      renderAll(applyFilter(points, radiusVal));
+    });
+  });
 }
 
 function showAddMedicationModal() {
