@@ -49,22 +49,22 @@ const RECYCLING_POINTS = [
 
 const DICAS_ARTIGOS = [
   { id: 'paracetamol', title: 'Paracetamol: quando o excesso vira risco', category: 'Medicação', publishedAt: '2024-01-15', readTime: 3, image: 'dicas/imagens/paracetamol.jpg', text: 'O paracetamol é um dos medicamentos mais utilizados em todo o mundo, e não é por acaso, pois é eficaz no alívio da dor e na redução da febre, sendo frequentemente a primeira escolha para tratar sintomas como gripe, dores de cabeça ou dores musculares. No entanto, mesmo os medicamentos mais comuns merecem cuidado e utilização responsável.\n\nPara um uso seguro, é essencial respeitar a dose recomendada, sendo que a dose máxima diária para um adulto é, normalmente, de 4 gramas (4000 mg), devendo sempre seguir as indicações do médico ou do farmacêutico. É também importante evitar a duplicação de medicamentos, uma vez que muitos fármacos para a gripe ou constipações já contêm paracetamol na sua composição, o que pode levar à ingestão excessiva sem que a pessoa se aperceba.\n\nOutro aspeto fundamental é o cuidado com o consumo de álcool, pois a sua associação com o paracetamol pode aumentar significativamente o risco de danos no fígado. No caso das crianças, deve ser utilizada sempre a dose correta de acordo com o peso e a idade, preferencialmente com orientação médica.\n\nO paracetamol é seguro quando usado corretamente, mas o seu uso excessivo pode ser perigoso, podendo causar lesões hepáticas graves. Por isso, sempre que existam dúvidas ou os sintomas persistam, é fundamental procurar um profissional de saúde. Pequenas escolhas conscientes fazem toda a diferença, inclusive na forma como cuidamos da nossa saúde.' },
-  { id: 'resfriado', title: 'Resfriado comum: especialistas alertam para cuidados essenciais durante a recuperação', category: 'Saúde', publishedAt: '2024-01-14', readTime: 5, image: 'dicas/imagens/resfriado.jpg', text: 'Com a mudança de temperatura, o aumento de casos de resfriado comum acende um alerta para a importância de cuidados simples que aceleram a recuperação e evitam a transmissão. Diferente da gripe, o resfriado costuma apresentar sintomas mais leves, como coriza, espirros e leve dor de garganta, mas ainda assim exige atenção.\n\nO pilar fundamental para o tratamento é o repouso aliado a uma hidratação constante, pois a ingestão de líquidos ajuda a manter as mucosas hidratadas e facilita a eliminação de secreções. Especialistas recomendam manter uma alimentação equilibrada, rica em vitaminas, para fortalecer o sistema imunológico enquanto o corpo combate o vírus.\n\nNo campo da prevenção, a higiene das mãos continua sendo a regra de ouro: lavar as mãos com frequência ou usar álcool em gel reduz drasticamente as chances de contágio. Além disso, evitar locais fechados e sem ventilação ajuda a conter a propagação do vírus para outras pessoas.\n\nÉ importante lembrar que o uso de medicamentos deve ser feito apenas sob orientação médica, focando no alívio dos sintomas, já que o corpo precisa de tempo para se recuperar naturalmente. Caso surjam sintomas mais graves, como febre persistente ou dificuldade para respirar, a recomendação é procurar uma unidade de saúde imediatamente. Cuidar de si durante um resfriado não é apenas uma questão de conforto, mas um gesto de responsabilidade com a saúde pública.' },
-  { id: 'halitose', title: 'O segredo do hálito fresco: pequenos gestos que transformam o seu bem-estar', category: 'Saúde', publishedAt: '2024-01-13', readTime: 4, image: 'dicas/imagens/halitose.png', text: 'O mau hálito, ou halitose, é um problema comum que afeta diretamente a autoestima e as relações sociais, mas a solução pode ser mais simples do que parece. O primeiro passo essencial é manter uma higiene rigorosa, escovando os dentes com pasta de flúor ao menos duas vezes ao dia por dois minutos e nunca esquecendo o fio dental para remover restos de comida entre os dentes.\n\nAlém disso, a língua merece atenção especial: a limpeza da parte de trás com um raspador ou escova suave ajuda a eliminar o acúmulo de bactérias que causa o mau cheiro. Manter o corpo hidratado também é fundamental, pois a água estimula o fluxo salivar necessário para neutralizar odores desagradáveis.\n\nGestos simples como mastigar pastilhas sem açúcar, evitar o tabaco e o álcool, e manter as próteses limpas fazem toda a diferença. Novas abordagens sugerem ainda que o uso de probióticos pode ajudar a equilibrar a flora oral. Se o problema persistir mesmo com esses cuidados, é importante consultar um profissional, pois a causa pode ser fisiológica ou até emocional. Afinal, cuidar da boca é cuidar de si mesmo e da sua confiança.' },
+  { id: 'resfriado', title: 'Constipação comum: especialistas alertam para cuidados essenciais durante a recuperação', category: 'Saúde', publishedAt: '2024-01-14', readTime: 5, image: 'dicas/imagens/resfriado.jpg', text: 'Com a mudança de temperatura, o aumento de casos de constipação comum acende um alerta para a importância de cuidados simples que aceleram a recuperação e evitam a transmissão. Diferente da gripe, a constipação costuma apresentar sintomas mais leves, como corrimento nasal, espirros e leve dor de garganta, mas ainda assim exige atenção.\n\nO pilar fundamental para o tratamento é o repouso aliado a uma hidratação constante, pois a ingestão de líquidos ajuda a manter as mucosas hidratadas e facilita a eliminação de secreções. Especialistas recomendam manter uma alimentação equilibrada, rica em vitaminas, para fortalecer o sistema imunitário enquanto o corpo combate o vírus.\n\nNo campo da prevenção, a higiene das mãos continua a ser a regra de ouro: lavar as mãos com frequência ou usar álcool-gel reduz drasticamente as hipóteses de contágio. Além disso, evitar locais fechados e sem ventilação ajuda a conter a propagação do vírus para outras pessoas.\n\nÉ importante lembrar que o uso de medicamentos deve ser feito apenas sob orientação médica, focando no alívio dos sintomas, já que o corpo precisa de tempo para recuperar naturalmente. Caso surjam sintomas mais graves, como febre persistente ou dificuldade em respirar, a recomendação é procurar uma unidade de saúde imediatamente. Cuidar de si durante uma constipação não é apenas uma questão de conforto, mas um gesto de responsabilidade para com a saúde pública.' },
+  { id: 'halitose', title: 'O segredo do hálito fresco: pequenos gestos que transformam o teu bem-estar', category: 'Saúde', publishedAt: '2024-01-13', readTime: 4, image: 'dicas/imagens/halitose.png', text: 'O mau hálito, ou halitose, é um problema comum que afeta diretamente a autoestima e as relações sociais, mas a solução pode ser mais simples do que parece. O primeiro passo essencial é manter uma higiene rigorosa, escovando os dentes com pasta de flúor pelo menos duas vezes ao dia por dois minutos e nunca esquecendo o fio dentário para remover restos de comida entre os dentes.\n\nAlém disso, a língua merece atenção especial: a limpeza da parte de trás com um raspador ou escova suave ajuda a eliminar a acumulação de bactérias que causa o mau cheiro. Manter o corpo hidratado também é fundamental, pois a água estimula o fluxo salivar necessário para neutralizar odores desagradáveis.\n\nGestos simples como mastigar pastilhas sem açúcar, evitar o tabaco e o álcool, e manter as próteses limpas fazem toda a diferença. Novas abordagens sugerem ainda que o uso de probióticos pode ajudar a equilibrar a flora oral. Se o problema persistir mesmo com esses cuidados, é importante consultar um profissional, pois a causa pode ser fisiológica ou até emocional. Afinal, cuidar da boca é cuidar de ti e da tua confiança.' },
   { id: 'lactose', title: 'Intolerância à Lactose: o que precisa de saber', category: 'Saúde', publishedAt: '2024-01-12', readTime: 3, image: 'dicas/imagens/lactose.jpg', text: 'Sentir desconforto depois de beber leite pode ser um sinal de intolerância à lactose. Esta condição acontece quando o corpo tem dificuldade em digerir a lactose, o açúcar natural do leite. Quando a lactose não é devidamente digerida, chega intacta ao intestino grosso, onde é fermentada pelas bactérias, provocando sintomas como gases, inchaço, dor abdominal e, por vezes, diarreia. Curiosamente, cerca de 65% da população mundial apresenta algum grau de intolerância à lactose.\n\nApesar disso, é totalmente possível viver bem com esta condição. No dia a dia, pode optar por leite e derivados sem lactose, que já contêm a enzima lactase, experimentar leites vegetais como os de amêndoa, aveia, soja ou arroz, e ler atentamente os rótulos dos alimentos, uma vez que a lactose pode estar presente em produtos inesperados, como molhos ou artigos de padaria. É também importante falar com o médico ou farmacêutico antes de tomar suplementos de lactase ou fazer alterações significativas na dieta.\n\nCada pessoa tem um nível diferente de intolerância, pelo que o segredo está em conhecer o próprio corpo e encontrar o equilíbrio que melhor funciona. Com acompanhamento médico e escolhas informadas, é possível manter uma alimentação saudável, saborosa e sem desconfortos.' },
 ];
 
 const TRAVEL_SECTIONS = [
   { id: 's1', title: 'Medicamentos essenciais (uso pessoal)', items: ['Medicamentos de uso contínuo (com receita, se necessário)', 'Quantidade extra (para atrasos/imprevistos)', 'Cópia da receita médica (importante para viagens internacionais)', 'Lista dos medicamentos e doses'], checkbox: true },
   { id: 's2', title: 'Dor, febre e inflamação', items: ['Paracetamol ou ibuprofeno', 'Termómetro (opcional, mas útil)'], checkbox: true },
-  { id: 's3', title: 'Estômago e intestino', items: ['Antidiarréico', 'Probióticos', 'Remédio para enjoo/náuseas', 'Antiácido / protetor gástrico', 'Sais de reidratação oral'], checkbox: true },
+  { id: 's3', title: 'Estômago e intestino', items: ['Antidiarreico', 'Probióticos', 'Medicamento para enjoos/náuseas', 'Antiácido / protetor gástrico', 'Sais de reidratação oral'], checkbox: true },
   { id: 's4', title: 'Gripes, alergias e respiração', items: ['Antialérgico (ex: loratadina, cetirizina)', 'Descongestionante nasal', 'Spray nasal com soro fisiológico', 'Pastilhas para dor de garganta'], checkbox: true },
   { id: 's5', title: 'Pele e primeiros socorros', items: ['Repelente de insetos', 'Protetor solar', 'Pomada para picadas/coceiras', 'Pomada cicatrizante/antisséptica', 'Curativos (pensos rápidos)', 'Gaze + fita adesiva', 'Álcool ou lenços antissépticos'], checkbox: true },
-  { id: 's6', title: 'Outros úteis', items: ['Remédio para dormir (se usas)', 'Colírio', 'Hidratante labial', 'Álcool gel'], checkbox: true },
+  { id: 's6', title: 'Outros úteis', items: ['Medicamento para dormir (se usas)', 'Colírio', 'Hidratante labial', 'Álcool-gel'], checkbox: true },
   { id: 's7', title: 'Documentação (muito importante)', items: ['Receita médica em inglês (ou idioma do destino)', 'Declaração médica para medicamentos controlados', 'Lista dos medicamentos (nome genérico + dosagem)', 'Cópia digital das receitas'], checkbox: true },
   { id: 's8', title: 'Antes de viajar', items: ['Ver site da embaixada do país de destino', 'Confirmar vacinas obrigatórias', 'Seguro de viagem com cobertura médica'], checkbox: true },
   { id: 's9', title: 'Atenção especial', items: ['Alguns países proíbem certos medicamentos (ex: codeína, tramadol, alguns ansiolíticos)', 'Leva sempre na bagagem de mão', 'Mantém os medicamentos na embalagem original', 'Líquidos acima de 100 ml só com declaração médica'], checkbox: false },
-  { id: 's10', title: 'Dicas rápidas', items: ['Leva os medicamentos na bagagem de mão', 'Verifica se algum remédio é proibido no país de destino', 'Mantém tudo na embalagem original', 'Se vais para um destino exótico, considera falar com um médico antes'], checkbox: false },
+  { id: 's10', title: 'Dicas rápidas', items: ['Leva os medicamentos na bagagem de mão', 'Verifica se algum medicamento é proibido no país de destino', 'Mantém tudo na embalagem original', 'Se vais para um destino exótico, considera falar com um médico antes'], checkbox: false },
 ];
 
 function genId() {
@@ -199,7 +199,7 @@ function scheduleReminderNotifications() {
       var timer = setTimeout(function () {
         if (!getSettings().notifications) return;
         var med = getMedicationById(r.medicationId);
-        var msg = 'Hora de tomar ' + (med ? med.name : 'o seu medicamento') + '.';
+        var msg = 'Hora de tomar ' + (med ? med.name : 'o teu medicamento') + '.';
         showToast(msg);
         if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
           try { new Notification('Lembrete DailyMed', { body: msg }); } catch (e) {}
@@ -241,34 +241,48 @@ function navigate(path, params) {
 }
 
 function viewHome() {
-  const meds = getMedications().filter(function (m) { return m.isActive; });
+  const meds = getMedications();
+  const activeCount = meds.filter(function (m) { return m.isActive; }).length;
   const remindersToday = getRemindersForToday().length;
+  const expiringSoon = meds.filter(function (m) { return getValidityStatus(m.expiryDate).type === 'soon'; }).length;
+  const stockLow = meds.filter(function (m) { return (parseInt(m.quantity || 0, 10) || 0) <= 10; }).length;
   return '<header class="relative px-4 flex items-center justify-center gap-3 bg-white">' +
     '<img src="logo.png" alt="DailyMed" class="h-40 w-40 object-contain" />' +
     '</header>' +
-    '<main class="p-4 space-y-4 bg-white">' +
-    '<div class="grid grid-cols-2 gap-4">' +
-    '<div class="rounded-2xl p-5 bg-white border border-gray-100 shadow-sm text-center"><p class="text-3xl font-bold text-primary">' + meds.length + '</p><p class="text-xs text-black mt-1">Medicamentos Ativos</p></div>' +
-    '<div class="rounded-2xl p-5 bg-white border border-gray-100 shadow-sm text-center"><p class="text-3xl font-bold text-secondary">' + remindersToday + '</p><p class="text-xs text-black mt-1">Lembretes de Hoje</p></div>' +
+    '<main class="p-4 space-y-5 bg-white">' +
+    '<div class="grid grid-cols-2 gap-3">' +
+    '<a href="#lembretes" class="home-shortcut home-shortcut--secondary"><span class="material-icons text-2xl">schedule</span><span>Lembretes</span></a>' +
+    '<a href="#medicacao" class="home-shortcut home-shortcut--primary"><span class="material-icons text-2xl">medication</span><span>Armário</span></a>' +
+    '<a href="#reciclagem" class="home-shortcut home-shortcut--secondary"><span class="material-icons text-2xl">eco</span><span>Reciclar</span></a>' +
+    '<a href="#dicas" class="home-shortcut home-shortcut--primary"><span class="material-icons text-2xl">bookmark</span><span>Dicas</span></a>' +
     '</div>' +
-    '<a href="#lembretes" class="flex flex-col items-center justify-center gap-2 py-6 px-4 rounded-xl bg-secondary text-white shadow-sm w-full"><span class="material-icons text-4xl">schedule</span><span class="text-sm font-medium">Lembretes</span></a>' +
-    '<div class="grid grid-cols-3 gap-3">' +
-    '<a href="#medicacao" class="flex flex-col items-center justify-center gap-2 py-5 px-3 rounded-xl bg-primary text-white shadow-sm min-h-[90px]"><span class="material-icons text-3xl">medication</span><span class="text-xs font-medium text-center leading-tight">Armário de Medicamentos</span></a>' +
-    '<a href="#reciclagem" class="flex flex-col items-center justify-center gap-2 py-5 px-3 rounded-xl bg-secondary text-white shadow-sm min-h-[90px]"><span class="material-icons text-3xl">eco</span><span class="text-xs font-medium text-center leading-tight">Reciclar</span></a>' +
-    '<a href="#dicas" class="flex flex-col items-center justify-center gap-2 py-5 px-3 rounded-xl bg-primary text-white shadow-sm min-h-[90px]"><span class="material-icons text-3xl">bookmark</span><span class="text-xs font-medium text-center leading-tight">Dicas</span></a>' +
-    '</div></main>';
+    '<section class="space-y-2">' +
+    '<p class="section-label">Resumo</p>' +
+    '<div class="space-y-3">' +
+    '<div class="summary-card"><div><p class="summary-title">Medicamentos ativos</p><p class="summary-sub">Total</p></div><div class="summary-value text-primary">' + activeCount + '</div></div>' +
+    '<div class="summary-card"><div><p class="summary-title">Lembretes de hoje</p><p class="summary-sub">Total</p></div><div class="summary-value text-secondary">' + remindersToday + '</div></div>' +
+    '</div>' +
+    '</section>' +
+    '<section class="space-y-2">' +
+    '<p class="section-label">Atenção</p>' +
+    '<div class="space-y-3">' +
+    '<div class="summary-card summary-card--warning"><div><p class="summary-title">Expira em breve</p><p class="summary-sub">Medicamentos</p></div><div class="summary-value text-yellow-600">' + expiringSoon + '</div></div>' +
+    '<div class="summary-card summary-card--danger"><div><p class="summary-title">Stock baixo</p><p class="summary-sub">Medicamentos</p></div><div class="summary-value text-red-600">' + stockLow + '</div></div>' +
+    '</div>' +
+    '</section>' +
+    '</main>';
 }
 
 function viewMedicacaoCategorias() {
   let list = '';
-  list = '<a href="#medicacao-armario" class="block w-full py-3 px-4 rounded-xl bg-primary-container text-black font-medium text-center">Ver Todos</a>';
+  list = '<a href="#medicacao-armario" class="block w-full py-3 px-4 rounded-xl bg-primary-container text-black font-medium text-center shadow-sm">Ver todos</a>';
   CATEGORIAS.forEach(function (c) {
-    list += '<a href="#medicacao-armario?cat=' + encodeURIComponent(c) + '" class="block w-full py-3 px-4 rounded-xl bg-primary-container text-black font-medium text-center">' + c + '</a>';
+    list += '<a href="#medicacao-armario?cat=' + encodeURIComponent(c) + '" class="block w-full py-3 px-4 rounded-xl bg-primary-container text-black font-medium text-center shadow-sm">' + c + '</a>';
   });
   return pageHeader('Armário de Medicamentos', '#home') +
     '<main class="p-4 space-y-3 bg-white">' +
-    '<button type="button" id="btn-adicionar-medicamento" class="flex items-center gap-3 w-full py-3 px-4 rounded-xl bg-primary text-white font-medium"><span class="material-icons">add_circle_outline</span><span>Adicionar Medicamento</span></button>' +
-    '<h3 class="text-base font-bold text-black text-center pt-2">Categorias de Medicamentos</h3>' +
+    '<button type="button" id="btn-adicionar-medicamento" class="flex items-center gap-3 w-full py-3 px-4 rounded-xl btn-primary font-medium"><span class="material-icons">add_circle_outline</span><span>Adicionar Medicamento</span></button>' +
+    '<h3 class="section-title text-center pt-2">Categorias de Medicamentos</h3>' +
     '<div class="space-y-2">' + list + '</div></main>';
 }
 
@@ -295,9 +309,9 @@ function viewMedicacaoArmario(params) {
     const titleLine = (nameEsc + ' ' + dosageEsc).trim() || 'Medicamento';
     const qty = m.quantity != null ? m.quantity : '-';
     const validadeStr = formatDateYMD(m.expiryDate) || '-';
-    const cardBg = m.isActive ? 'bg-primary-container text-gray-800' : 'bg-white border border-gray-200 text-gray-800';
+    const cardBg = m.isActive ? 'app-card app-card--soft text-gray-800' : 'app-card text-gray-800';
     const dotHtml = m.isActive ? '<span class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-primary" aria-hidden="true" title="Ativo"></span>' : '';
-    listHtml += '<div class="rounded-2xl p-4 shadow-sm ' + cardBg + ' relative">' +
+    listHtml += '<div class="p-4 ' + cardBg + ' relative">' +
       dotHtml +
       '<div class="med-card-detail cursor-pointer block focus:outline-none" data-id="' + m.id + '" role="button" tabindex="0">' +
       '<p class="font-bold text-sm leading-tight pr-6">' + titleLine + '</p>' +
@@ -309,16 +323,16 @@ function viewMedicacaoArmario(params) {
       '</div>';
   });
 
-  let filterLinks = '<a href="' + filterBase + '" class="inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-full text-sm ' + (!filter ? 'bg-gray-200 text-gray-800' : 'bg-gray-100 text-gray-600') + '">' + (!filter ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + 'Todos</a>';
-  filterLinks += '<a href="' + filterBase + (catQs ? '&' : '?') + 'filter=ativos' + '" class="inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-full text-sm ' + (filter === 'ativos' ? 'bg-gray-200 text-gray-800' : 'bg-gray-100 text-gray-600') + '">' + (filter === 'ativos' ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + 'Medicamentos Ativos</a>';
+  let filterLinks = '<a href="' + filterBase + '" class="chip ' + (!filter ? 'chip--active' : 'chip--ghost') + '">' + (!filter ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + 'Todos</a>';
+  filterLinks += '<a href="' + filterBase + (catQs ? '&' : '?') + 'filter=ativos' + '" class="chip ' + (filter === 'ativos' ? 'chip--active' : 'chip--ghost') + '">' + (filter === 'ativos' ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + 'Medicamentos ativos</a>';
   ['stock', 'expirando', 'expirados', 'baixo'].forEach(function (f) {
-    const label = f === 'stock' ? 'Em Stock' : f === 'expirando' ? 'Expirando' : f === 'expirados' ? 'Expirados' : 'Estoque baixo';
+    const label = f === 'stock' ? 'Em stock' : f === 'expirando' ? 'A expirar' : f === 'expirados' ? 'Expirados' : 'Stock baixo';
     const sep = catQs ? '&' : '?';
-    filterLinks += '<a href="' + filterBase + sep + 'filter=' + f + '" class="inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-full text-sm ' + (filter === f ? 'bg-gray-200 text-gray-800' : 'bg-gray-100 text-gray-600') + '">' + (filter === f ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + label + '</a>';
+    filterLinks += '<a href="' + filterBase + sep + 'filter=' + f + '" class="chip ' + (filter === f ? 'chip--active' : 'chip--ghost') + '">' + (filter === f ? '<span class="w-2 h-2 rounded-full bg-primary"></span>' : '') + label + '</a>';
   });
 
   let banner = '';
-  if (detected.length > 0) banner = '<a href="#medicacao-interacoes" class="block p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm"><span class="material-icons align-middle text-lg mr-1">warning</span>Atenção: ' + detected.length + ' interação(ões) detetada(s). Toque para ver.</a>';
+  if (detected.length > 0) banner = '<a href="#medicacao-interacoes" class="block p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm"><span class="material-icons align-middle text-lg mr-1">warning</span>Atenção: ' + detected.length + ' interação(ões) detetada(s). Toca para ver.</a>';
   const gridOrEmpty = list.length === 0
     ? '<p class="text-center text-on-surface-variant py-8">Nenhum medicamento encontrado.</p>'
     : '<div class="grid grid-cols-2 gap-3">' + listHtml + '</div><button type="button" id="btn-adicionar-medicamento-fab" class="fixed bottom-24 right-4 w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg" aria-label="Adicionar medicamento"><span class="material-icons">add</span></button>';
@@ -329,7 +343,7 @@ function viewMedicacaoArmario(params) {
     '<input type="search" placeholder="Pesquisar nome ou fabricante..." class="w-full px-4 py-2 rounded-xl border border-gray-200" id="armario-search" value="' + (params.q || '').replace(/"/g, '&quot;') + '" />' +
     '<h3 class="font-bold text-black">Os Meus Medicamentos</h3>' +
     '<div class="flex flex-wrap gap-2">' + filterLinks + '</div>' +
-    '<p class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm bg-gray-100 text-gray-700"><span class="w-2 h-2 rounded-full bg-primary"></span>Medicamentos Ativos</p>' +
+    '<p class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm bg-gray-100 text-gray-700"><span class="w-2 h-2 rounded-full bg-primary"></span>Medicamentos ativos</p>' +
     (category ? '<p class="text-sm text-on-surface-variant">Categoria: ' + category.replace(/</g, '&lt;') + '</p>' : '') +
     banner +
     gridOrEmpty +
@@ -431,7 +445,7 @@ function viewMedicacaoInteracoes() {
   let detHtml = detected.length === 0 ? '<p class="text-on-surface-variant">Nenhuma interação detetada.</p>' : '<ul class="space-y-3">' + detected.map(function (i) { return '<li class="p-3 rounded-xl border-l-4" style="border-color:' + i.color + '"><p class="font-medium">' + i.combination + '</p><p class="text-sm capitalize">' + i.severity + '</p><p class="text-sm mt-1">' + i.mechanism + '</p></li>'; }).join('') + '</ul>';
   let knownHtml = '<ul class="space-y-3">' + known.map(function (i) { return '<li class="p-3 rounded-xl border border-outline" style="border-left-width:4px;border-left-color:' + i.color + '"><p class="font-medium">' + i.combination + '</p><p class="text-sm capitalize">' + i.severity + '</p><p class="text-sm mt-1">' + i.mechanism + '</p></li>'; }).join('') + '</ul>';
   return pageHeader('Interações Medicamentosas', '#medicacao-armario') +
-    '<main class="p-4 space-y-6 bg-white"><section><h2 class="font-bold text-lg mb-2">Interações detetadas no seu armário</h2>' + detHtml + '</section><section><h2 class="font-bold text-lg mb-2">Interações que a app verifica</h2>' + knownHtml + '</section></main>';
+    '<main class="p-4 space-y-6 bg-white"><section><h2 class="font-bold text-lg mb-2">Interações detetadas no teu armário</h2>' + detHtml + '</section><section><h2 class="font-bold text-lg mb-2">Interações que a app verifica</h2>' + knownHtml + '</section></main>';
 }
 
 function viewMedicacaoHistorico() {
@@ -445,11 +459,11 @@ function viewMedicacaoFolheto(params) {
   const m = getMedicationById(params.id);
   if (!m) return viewMedicacaoCategorias();
   return pageHeader('Folheto informativo', '#medicacao-detalhes?id=' + params.id) +
-    '<main class="p-4 prose prose-sm max-w-none bg-white"><h2>' + (m.name || '').replace(/</g, '&lt;') + '</h2><p><strong>Composição:</strong> ' + (m.substance || '-').replace(/</g, '&lt;') + '. Dosagem: ' + (m.dosage || '-').replace(/</g, '&lt;') + '.</p><p>Consulte sempre o folheto da embalagem ou o seu médico/farmacêutico para informações completas.</p></main>';
+    '<main class="p-4 prose prose-sm max-w-none bg-white"><h2>' + (m.name || '').replace(/</g, '&lt;') + '</h2><p><strong>Composição:</strong> ' + (m.substance || '-').replace(/</g, '&lt;') + '. Dosagem: ' + (m.dosage || '-').replace(/</g, '&lt;') + '.</p><p>Consulta sempre o folheto da embalagem ou o teu médico/farmacêutico para informações completas.</p></main>';
 }
 
 function viewChecklistViagem() {
-  let html = pageHeader('Checklist de Viagem', '#medicacao') + '<main class="p-4 space-y-6 bg-white"><p class="text-sm text-on-surface-variant text-center -mt-2">Lista para não esquecer nada antes de viajar.</p>';
+  let html = pageHeader('Lista de verificação de viagem', '#medicacao') + '<main class="p-4 space-y-6 bg-white"><p class="text-sm text-on-surface-variant text-center -mt-2">Lista para não te esqueceres de nada antes de viajar.</p>';
   const state = getTravelChecklistState();
   TRAVEL_SECTIONS.forEach(function (sec) {
     html += '<section class="card-round border border-outline p-4"><h2 class="font-bold mb-3">' + sec.title + '</h2>';
@@ -478,12 +492,12 @@ function viewLembretes() {
     const med = getMedicationById(r.medicationId);
     const hours = (r.times && r.times.length ? r.times.join(' · ') : (r.time || ''));
     const isTakenToday = r.lastTakenDate === today;
-    const takenLabel = isTakenToday ? 'Já Tomei' : 'Não Tomado';
+    const takenLabel = isTakenToday ? 'Já tomei' : 'Não tomado';
     const takenIcon = isTakenToday ? 'check_circle' : 'close';
     const takenClasses = isTakenToday
-      ? 'taken-btn flex items-center justify-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-primary text-on-primary'
+      ? 'taken-btn flex items-center justify-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium btn-primary'
       : 'taken-btn flex items-center justify-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium border border-red-500 text-red-500 bg-transparent';
-    return '<li class="p-4 rounded-xl border border-outline bg-surface card-round">' +
+    return '<li class="p-4 app-card card-round">' +
       '<div class="flex justify-between items-start gap-3">' +
       '<div>' +
       '<p class="font-medium">' + (med ? med.name : 'Medicamento').replace(/</g, '&lt;') + '</p>' +
@@ -506,13 +520,13 @@ function viewLembretes() {
       '</li>';
   }).join('') + '</ul>';
   return pageHeader('Lembretes', null) +
-    '<main class="p-4 space-y-4 bg-white"><a href="#lembretes-novo" class="flex items-center gap-3 w-full py-3 px-4 rounded-xl bg-primary text-white font-medium"><span class="material-icons">add_circle_outline</span><span>Adicionar Lembrete</span></a>' + listHtml + '</main>';
+    '<main class="p-4 space-y-4 bg-white"><a href="#lembretes-novo" class="flex items-center gap-3 w-full py-3 px-4 rounded-xl btn-primary font-medium"><span class="material-icons">add_circle_outline</span><span>Adicionar Lembrete</span></a>' + listHtml + '</main>';
 }
 
 function viewLembretesNovo() {
   const meds = getMedications().filter(function (m) { return m.isActive; });
   const medButtons = meds.length === 0
-    ? '<p class="text-xs text-on-surface-variant">Não existem medicamentos ativos. Adicione primeiro um medicamento.</p>'
+    ? '<p class="text-xs text-on-surface-variant">Não existem medicamentos ativos. Adiciona primeiro um medicamento.</p>'
     : meds.map(function (m) {
         return '<button type="button" class="med-option flex items-center justify-between w-full px-4 py-3 rounded-xl border border-outline bg-white text-left" data-id="' + m.id + '">' +
           '<span class="flex flex-col"><span class="text-sm font-medium">' + (m.name || '').replace(/</g, '&lt;') + '</span><span class="text-xs text-on-surface-variant">' + (m.dosage || '').replace(/</g, '&lt;') + '</span></span>' +
@@ -529,18 +543,18 @@ function viewLembretesNovo() {
   return pageHeader('Novo Lembrete', '#lembretes') +
     '<main class="p-4 bg-white"><form id="form-new-reminder" class="space-y-4">' +
     '<div><label class="block text-sm font-medium mb-1">Medicamento ativo *</label><div id="rem-medication-list" class="space-y-2">' + medButtons + '</div><input type="hidden" name="medicationId" id="rem-medication-id" required /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Data início *</label><input type="date" name="startDate" required value="' + todayStr() + '" class="w-full px-4 py-2 input-outline" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Data fim</label><input type="date" name="endDate" class="w-full px-4 py-2 input-outline" /></div>' +
+    '<div><label class="block text-sm font-medium mb-1">Data de início *</label><input type="date" name="startDate" required value="' + todayStr() + '" class="w-full px-4 py-2 input-outline" /></div>' +
+    '<div><label class="block text-sm font-medium mb-1">Data de fim</label><input type="date" name="endDate" class="w-full px-4 py-2 input-outline" /></div>' +
     '<div>' +
-    '<label class="block text-sm font-medium mb-1">Selecione Período</label>' +
+    '<label class="block text-sm font-medium mb-1">Seleciona o período</label>' +
     '<div id="rem-period-list" class="space-y-2">' + periodButtons + '</div>' +
     '<div class="mt-4">' +
-    '<p class="text-sm font-medium mb-1">Selecione até 3 horários</p>' +
+    '<p class="text-sm font-medium mb-1">Seleciona até 3 horários</p>' +
     '<div id="rem-time-grid" class="grid grid-cols-3 gap-2"></div>' +
     '<p class="text-xs text-on-surface-variant mt-1">Os horários são sugeridos de 30 em 30 minutos dentro do período escolhido.</p>' +
     '</div>' +
     '</div>' +
-    '<button type="submit" class="w-full py-3 bg-primary text-on-primary font-medium rounded-xl btn-round">Criar lembrete</button></form></main>';
+    '<button type="submit" class="w-full py-3 btn-primary font-medium rounded-xl btn-round">Criar lembrete</button></form></main>';
 }
 
 function viewLembretesEditar(params) {
@@ -568,18 +582,18 @@ function viewLembretesEditar(params) {
   return pageHeader('Editar Lembrete', '#lembretes') +
     '<main class="p-4 bg-white"><form id="form-edit-reminder" data-id="' + r.id + '" class="space-y-4">' +
     '<div><label class="block text-sm font-medium mb-1">Medicamento ativo *</label><div id="rem-medication-list" class="space-y-2">' + medButtons + '</div><input type="hidden" name="medicationId" id="rem-medication-id" value="' + (r.medicationId || '') + '" required /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Data início *</label><input type="date" name="startDate" required value="' + (r.startDate || '') + '" class="w-full px-4 py-2 input-outline" /></div>' +
-    '<div><label class="block text-sm font-medium mb-1">Data fim</label><input type="date" name="endDate" value="' + (r.endDate || '') + '" class="w-full px-4 py-2 input-outline" /></div>' +
+    '<div><label class="block text-sm font-medium mb-1">Data de início *</label><input type="date" name="startDate" required value="' + (r.startDate || '') + '" class="w-full px-4 py-2 input-outline" /></div>' +
+    '<div><label class="block text-sm font-medium mb-1">Data de fim</label><input type="date" name="endDate" value="' + (r.endDate || '') + '" class="w-full px-4 py-2 input-outline" /></div>' +
     '<div>' +
-    '<label class="block text-sm font-medium mb-1">Selecione Período</label>' +
+    '<label class="block text-sm font-medium mb-1">Seleciona o período</label>' +
     '<div id="rem-period-list" class="space-y-2">' + periodButtons + '</div>' +
     '<div class="mt-4">' +
-    '<p class="text-sm font-medium mb-1">Selecione até 3 horários</p>' +
+    '<p class="text-sm font-medium mb-1">Seleciona até 3 horários</p>' +
     '<div id="rem-time-grid" class="grid grid-cols-3 gap-2"></div>' +
     '<p class="text-xs text-on-surface-variant mt-1">Os horários são sugeridos de 30 em 30 minutos dentro do período escolhido.</p>' +
     '</div>' +
     '</div>' +
-    '<button type="submit" class="w-full py-3 bg-primary text-on-primary font-medium rounded-xl btn-round">Guardar</button></form></main>';
+    '<button type="submit" class="w-full py-3 btn-primary font-medium rounded-xl btn-round">Guardar</button></form></main>';
 }
 
 function viewReciclagem() {
@@ -603,7 +617,7 @@ function viewReciclagem() {
     '</div>' +
     milestoneBlock +
     '<div class="space-y-2">' +
-    '<a href="#reciclagem-registar" class="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl bg-primary text-white font-medium"><span class="material-icons">add_circle_outline</span><span>Registar Entrega</span></a>' +
+    '<a href="#reciclagem-registar" class="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl btn-primary font-medium"><span class="material-icons">add_circle_outline</span><span>Registar Entrega</span></a>' +
     '<a href="#reciclagem-guia" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span>Guia de Reciclagem</span><span class="material-icons text-gray-500">chevron_right</span></a>' +
     '<a href="#reciclagem-pontos" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span>Localizador de Pontos</span><span class="material-icons text-gray-500">chevron_right</span></a>' +
     '<a href="#reciclagem-historico" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-primary-container text-black font-medium"><span>Histórico</span><span class="material-icons text-gray-500">chevron_right</span></a>' +
@@ -613,21 +627,21 @@ function viewReciclagem() {
 
 function viewReciclagemRegistar() {
   return pageHeader('Registar Entrega', '#reciclagem') +
-    '<main class="p-4 bg-white"><form id="form-recycling" class="space-y-4"><div><label class="block text-sm font-medium mb-1">Volume *</label><select name="volume" required class="w-full px-4 py-2 input-outline"><option value="pequeno">Pequeno (~6 embalagens)</option><option value="medio">Médio (~15)</option><option value="grande">Grande (~30)</option></select></div><div><label class="block text-sm font-medium mb-1">Nome da farmácia (opcional)</label><input type="text" name="pharmacyName" class="w-full px-4 py-2 input-outline" /></div><div id="recycling-summary" class="hidden p-3 rounded-xl bg-gray-100 text-sm"></div><button type="submit" class="w-full py-3 bg-primary text-on-primary font-medium rounded-xl btn-round">Confirmar</button></form></main>';
+    '<main class="p-4 bg-white"><form id="form-recycling" class="space-y-4"><div><label class="block text-sm font-medium mb-1">Volume *</label><select name="volume" required class="w-full px-4 py-2 input-outline"><option value="pequeno">Pequeno (~6 embalagens)</option><option value="medio">Médio (~15)</option><option value="grande">Grande (~30)</option></select></div><div><label class="block text-sm font-medium mb-1">Nome da farmácia (opcional)</label><input type="text" name="pharmacyName" class="w-full px-4 py-2 input-outline" /></div><div id="recycling-summary" class="hidden p-3 rounded-xl bg-gray-100 text-sm"></div><button type="submit" class="w-full py-3 btn-primary font-medium rounded-xl btn-round">Confirmar</button></form></main>';
 }
 
 function viewReciclagemGuia() {
   return pageHeader('Guia de Reciclagem', '#reciclagem') +
     '<main class="p-4 bg-white space-y-3">' +
     '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">recycling</span></div><div><h3>O que entregar (Valormed)</h3><p>Medicamentos fora de prazo, embalagens vazias, medicamentos veterinários.</p></div></section>' +
-    '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">block</span></div><div><h3>O que não fazer</h3><p>Não deitar no lixo comum nem na sanita.</p></div></section>' +
+    '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">block</span></div><div><h3>O que não fazer</h3><p>Não deitar nos resíduos indiferenciados nem na sanita.</p></div></section>' +
     '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">location_on</span></div><div><h3>Onde entregar</h3><p>Farmácias e parafarmácias aderentes.</p></div></section>' +
     '<section class="recycling-guide-card"><div class="recycling-guide-icon"><span class="material-icons">verified_user</span></div><div><h3>Cuidados</h3><p>Entregar embalagens fechadas e retirar dados pessoais.</p></div></section>' +
     '</main>';
 }
 
 function viewReciclagemPontos() {
-  const pointsHtml = RECYCLING_POINTS.map(function (p, i) { return '<li><a href="#reciclagem-ponto?id=' + i + '" class="block p-4 rounded-xl border border-outline card-round"><div class="flex items-start gap-3"><span class="material-icons text-primary">location_on</span><div><p class="font-medium">' + p.name + '</p><p class="text-sm text-on-surface-variant">' + p.address + '</p><p class="text-sm flex items-center gap-1"><span class="material-icons text-sm">straighten</span> ' + p.distance + '</p></div></div></a></li>'; }).join('');
+  const pointsHtml = RECYCLING_POINTS.map(function (p, i) { return '<li><a href="#reciclagem-ponto?id=' + i + '" class="block p-4 app-card"><div class="flex items-start gap-3"><span class="material-icons text-primary">location_on</span><div><p class="font-medium">' + p.name + '</p><p class="text-sm text-on-surface-variant">' + p.address + '</p><p class="text-sm flex items-center gap-1"><span class="material-icons text-sm">straighten</span> ' + p.distance + '</p></div></div></a></li>'; }).join('');
   return pageHeader('Localizador de Pontos', '#reciclagem') +
     '<main class="p-4 bg-white"><ul class="space-y-3">' + pointsHtml + '</ul></main>';
 }
@@ -642,16 +656,16 @@ function viewReciclagemPonto(params) {
 
 function viewReciclagemHistorico() {
   const list = getRecyclingDeliveries().slice().reverse();
-  const listHtml = list.length === 0 ? '<p class="text-on-surface-variant">Nenhuma entrega registada.</p>' : '<ul class="space-y-3">' + list.map(function (d) { return '<li class="p-3 rounded-xl border border-outline"><p class="font-medium">' + (d.date || '') + '</p><p class="text-sm">' + (d.totalPackages || 0) + ' embalagens · ' + (d.points || 0) + ' pontos' + (d.pharmacyName ? ' · ' + d.pharmacyName : '') + '</p></li>'; }).join('') + '</ul>';
+  const listHtml = list.length === 0 ? '<p class="text-on-surface-variant">Nenhuma entrega registada.</p>' : '<ul class="space-y-3">' + list.map(function (d) { return '<li class="p-3 app-card"><p class="font-medium">' + (d.date || '') + '</p><p class="text-sm">' + (d.totalPackages || 0) + ' embalagens · ' + (d.points || 0) + ' pontos' + (d.pharmacyName ? ' · ' + d.pharmacyName : '') + '</p></li>'; }).join('') + '</ul>';
   return pageHeader('Histórico de Reciclagem', '#reciclagem') +
     '<main class="p-4 bg-white">' + listHtml + '</main>';
 }
 
 function viewDicas() {
-  const cards = DICAS_ARTIGOS.map(function (a) { return '<a href="#dicas-artigo?id=' + a.id + '" class="block rounded-xl border border-outline overflow-hidden card-round bg-surface"><img src="' + a.image + '" alt="" class="w-full h-40 object-cover" /><div class="p-4"><span class="text-xs text-primary font-medium">' + a.category + '</span><h2 class="font-bold mt-1">' + a.title.replace(/</g, '&lt;') + '</h2><p class="text-sm text-on-surface-variant">' + a.readTime + ' min de leitura</p></div></a>'; }).join('');
+  const cards = DICAS_ARTIGOS.map(function (a) { return '<a href="#dicas-artigo?id=' + a.id + '" class="block app-card overflow-hidden"><img src="' + a.image + '" alt="" class="w-full h-40 object-cover" /><div class="p-4"><span class="text-xs text-primary font-medium">' + a.category + '</span><h2 class="font-bold mt-1">' + a.title.replace(/</g, '&lt;') + '</h2><p class="text-sm text-on-surface-variant">' + a.readTime + ' min de leitura</p></div></a>'; }).join('');
   return pageHeader('Dicas de Saúde', null) +
     '<main class="p-4 bg-white"><div class="grid gap-4">' +
-    '<a href="#checklist-viagem" class="flex items-center justify-between w-full py-3 px-4 rounded-xl bg-secondary-container text-secondary font-medium"><span class="flex items-center gap-3"><span class="material-icons">flight_takeoff</span><span>Checklist de Viagem</span></span><span class="material-icons text-gray-500">chevron_right</span></a>' +
+    '<a href="#checklist-viagem" class="flex items-center justify-between w-full py-3 px-4 rounded-xl app-card app-card--soft text-primary font-medium"><span class="flex items-center gap-3"><span class="material-icons">flight_takeoff</span><span>Lista de verificação de viagem</span></span><span class="material-icons text-gray-500">chevron_right</span></a>' +
     cards + '</div></main>';
 }
 
@@ -708,7 +722,7 @@ function pageHeader(title, backHref) {
   return '<header class="relative px-4 flex items-center justify-center bg-white">' + back +
     '<img src="logo.png" alt="DailyMed" class="h-40 w-40 object-contain" />' +
     '</header>' +
-    (title ? '<div class="px-4 pb-4 bg-white"><h2 class="text-lg font-bold text-black text-center">' + title + '</h2></div>' : '');
+    (title ? '<div class="px-4 pb-4 bg-white"><h2 class="page-title text-black text-center">' + title + '</h2></div>' : '');
 }
 
 function runRoute() {
@@ -989,7 +1003,7 @@ function afterRender(path, params) {
         selectedTimes.splice(idx, 1);
       } else {
         if (selectedTimes.length >= 3) {
-          alert('Só pode selecionar até 3 horários distintos.');
+          alert('Só podes selecionar até 3 horários distintos.');
           return;
         }
         selectedTimes.push(t);
@@ -1011,7 +1025,7 @@ function afterRender(path, params) {
       var fd = new FormData(formNewRem);
       var times = (typeof formNewRem._getSelectedTimes === 'function') ? formNewRem._getSelectedTimes() : [];
       if (!times.length) {
-        alert('Selecione pelo menos um horário.');
+        alert('Seleciona pelo menos um horário.');
         return;
       }
       if (times.length > 3) times = times.slice(0, 3);
@@ -1052,7 +1066,7 @@ function afterRender(path, params) {
       if (!r) return;
       var timesEdit = (typeof formEditRem._getSelectedTimes === 'function') ? formEditRem._getSelectedTimes() : [];
       if (!timesEdit.length) {
-        alert('Selecione pelo menos um horário.');
+        alert('Seleciona pelo menos um horário.');
         return;
       }
       if (timesEdit.length > 3) timesEdit = timesEdit.slice(0, 3);
@@ -1117,7 +1131,7 @@ function afterRender(path, params) {
       if (settings.notifications && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
         var med = getMedicationById(r.medicationId);
         var titulo = 'Lembrete DailyMed';
-        var corpo = 'Hora de tomar ' + (med ? med.name : 'o seu medicamento') + '.';
+        var corpo = 'Hora de tomar ' + (med ? med.name : 'o teu medicamento') + '.';
         setTimeout(function () {
           try {
             new Notification(titulo, { body: corpo });
@@ -1209,10 +1223,10 @@ function afterRender(path, params) {
 function showAddMedicationModal() {
   var html = '<div id="modal-add-med" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">' +
     '<div class="bg-white rounded-2xl max-w-md w-full shadow-lg p-5">' +
-    '<h3 class="font-bold text-lg text-black text-center mb-5">Como deseja adicionar o medicamento?</h3>' +
+    '<h3 class="font-bold text-lg text-black text-center mb-5">Como queres adicionar o medicamento?</h3>' +
     '<div class="space-y-3">' +
-    '<button type="button" id="modal-add-manual" class="flex items-center gap-3 w-full py-3 px-4 rounded-xl bg-primary text-white font-medium"><span class="material-icons">edit</span><span>Adicionar Manualmente</span></button>' +
-    '<button type="button" id="modal-add-pesquisar" class="flex items-center gap-3 w-full py-3 px-4 rounded-xl bg-secondary text-white font-medium"><span class="material-icons">search</span><span>Pesquisar Medicamento</span></button>' +
+    '<button type="button" id="modal-add-manual" class="flex items-center gap-3 w-full py-3 px-4 rounded-xl bg-primary text-white font-medium"><span class="material-icons">edit</span><span>Adicionar manualmente</span></button>' +
+    '<button type="button" id="modal-add-pesquisar" class="flex items-center gap-3 w-full py-3 px-4 rounded-xl bg-secondary text-white font-medium"><span class="material-icons">search</span><span>Pesquisar medicamento</span></button>' +
     '<button type="button" id="modal-add-cancelar" class="flex items-center justify-center w-full py-3 px-4 rounded-xl bg-gray-100 text-gray-700 font-medium">Cancelar</button>' +
     '</div></div></div>';
   document.body.insertAdjacentHTML('beforeend', html);
