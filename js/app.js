@@ -1272,6 +1272,16 @@ function getRouteFromFallback(fallback) {
   return (fallback.charAt(0) === '#' ? fallback.slice(1) : fallback).split('?')[0] || '';
 }
 
+
+function enforceMedicacaoRootBackState() {
+  var route = parseHash().path || 'home';
+  var shouldHideBack = route === 'medicacao' || route === 'medicacao-categorias';
+  if (!shouldHideBack) return;
+  document.querySelectorAll('.subpage-header [aria-label="Voltar"]').forEach(function (el) {
+    el.remove();
+  });
+}
+
 function runRoute() {
   const parsed = parseHash();
   const pathNorm = parsed.path || 'home';
@@ -1284,17 +1294,14 @@ function runRoute() {
   const showNav = ['home', 'medicacao', 'lembretes', 'reciclagem', 'dicas'].indexOf(pathNorm.split('-')[0]) >= 0;
   render(fn(parsed.params), showNav);
   afterRender(pathNorm, parsed.params);
+  window.setTimeout(enforceMedicacaoRootBackState, 0);
 }
 
 function afterRender(path, params) {
   setupFab();
   if (path === 'reciclagem-pontos') initRecyclingMap();
 
-  if (path === 'medicacao' || path === 'medicacao-categorias') {
-    document.querySelectorAll('.subpage-header .back-btn, .subpage-header a[aria-label="Voltar"]').forEach(function (el) {
-      el.remove();
-    });
-  }
+  enforceMedicacaoRootBackState();
 
   document.querySelectorAll('.back-btn').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
@@ -2267,6 +2274,13 @@ function init() {
   if (s.notifications && typeof Notification !== 'undefined' && Notification.permission === 'default') Notification.requestPermission();
   maybeShowOnboarding();
   window.addEventListener('hashchange', runRoute);
+  var backGuardTarget = document.getElementById('app');
+  if (backGuardTarget && typeof MutationObserver !== 'undefined') {
+    var backGuardObserver = new MutationObserver(function () {
+      enforceMedicacaoRootBackState();
+    });
+    backGuardObserver.observe(backGuardTarget, { childList: true, subtree: true });
+  }
   document.body.addEventListener('click', function (e) {
     if (e.target.closest('#btn-adicionar-medicamento') || e.target.closest('#btn-adicionar-medicamento-fab')) {
       e.preventDefault();

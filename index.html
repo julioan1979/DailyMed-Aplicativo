@@ -39,6 +39,40 @@
       if (s) { var j = JSON.parse(s); document.body.classList.toggle('dark', j.theme === 'dark'); }
     } catch (e) {}
   </script>
+  <script>
+    (function () {
+      function getHashRoute() {
+        var raw = (window.location && window.location.hash) || '#home';
+        var hash = raw.replace(/^#/, '');
+        var path = hash.split('?')[0] || 'home';
+        return path;
+      }
+
+      function enforceBackVisibilityByRoute() {
+        var route = getHashRoute();
+        document.body.setAttribute('data-route', route);
+        if (route !== 'medicacao' && route !== 'medicacao-categorias') return;
+        document.querySelectorAll('.subpage-header [aria-label="Voltar"]').forEach(function (el) {
+          el.remove();
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', enforceBackVisibilityByRoute);
+      } else {
+        enforceBackVisibilityByRoute();
+      }
+      window.addEventListener('hashchange', function () {
+        window.setTimeout(enforceBackVisibilityByRoute, 0);
+      });
+      if (typeof MutationObserver !== 'undefined') {
+        var mo = new MutationObserver(function () {
+          enforceBackVisibilityByRoute();
+        });
+        mo.observe(document.body, { childList: true, subtree: true });
+      }
+    })();
+  </script>
   <div id="app" class="max-w-lg mx-auto min-h-screen"></div>
 
   <!-- Bottom navigation -->
