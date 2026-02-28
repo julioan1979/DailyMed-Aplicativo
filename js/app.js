@@ -1239,9 +1239,12 @@ const ROUTES = {
 };
 
 function pageHeader(title, backHref) {
-  var route = parseHash().path || 'home';
+  var parsedHash = parseHash();
+  var route = parsedHash.path || 'home';
+  var params = parsedHash.params || {};
   var isMedicacaoRoot = route === 'medicacao' || route === 'medicacao-categorias';
-  var shouldRenderBack = !!backHref && !isMedicacaoRoot;
+  var isMedicacaoArmarioRoot = route === 'medicacao-armario' && !(params.cat || params.q || '') && (params.filter || 'todos') === 'todos';
+  var shouldRenderBack = !!backHref && !isMedicacaoRoot && !isMedicacaoArmarioRoot;
   var back = shouldRenderBack ? '<button type="button" class="back-btn absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 p-1 rounded-full hover:bg-gray-100" data-back="' + backHref + '" aria-label="Voltar"><span class="material-icons">arrow_back</span></button>' : '';
   var safeTitle = title ? escapeHtml(title) : '';
   return '<header class="subpage-header relative px-4 flex items-center justify-center bg-white">' + back +
@@ -1285,6 +1288,12 @@ function runRoute() {
 function afterRender(path, params) {
   setupFab();
   if (path === 'reciclagem-pontos') initRecyclingMap();
+
+  if (path === 'medicacao' || path === 'medicacao-categorias') {
+    document.querySelectorAll('.subpage-header .back-btn, .subpage-header a[aria-label="Voltar"]').forEach(function (el) {
+      el.remove();
+    });
+  }
 
   document.querySelectorAll('.back-btn').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
