@@ -601,8 +601,11 @@ function viewMedicacaoCategorias() {
 
 function viewMedicacaoArmario(params) {
   const filter = params.filter || 'todos';
-  const search = (params.q || '').toLowerCase();
+  const rawSearch = (params.q || '');
+  const search = rawSearch.toLowerCase();
   const category = params.cat || '';
+  const isDefaultArmarioView = !category && !rawSearch.trim() && filter === 'todos';
+  const headerBackHref = isDefaultArmarioView ? null : '#medicacao';
   let list = getMedications();
   if (filter === 'semlembretes') {
     list = list.filter(function (m) {
@@ -671,9 +674,9 @@ function viewMedicacaoArmario(params) {
     ? '<div class="empty-state"><div class="empty-icon"><span class="material-icons">inventory_2</span></div><p>Não existem medicamentos para mostrar.</p><a href="#medicacao-adicionar" class="inline-flex items-center justify-center mt-3 px-4 py-2 btn-primary">Adicionar medicamento</a></div>'
     : '<div class="grid grid-cols-1 gap-3">' + listHtml + '</div><button type="button" id="btn-adicionar-medicamento-fab" class="fixed bottom-24 right-4 w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg" aria-label="Adicionar medicamento"><span class="material-icons">add</span></button>';
 
-  return pageHeader(category ? category : 'Armário de Medicamentos', '#medicacao') +
+  return pageHeader(category ? category : 'Armário de Medicamentos', headerBackHref) +
     '<main class="app-main space-y-4 bg-white">' +
-    '<a href="#medicacao" class="flex items-center justify-center gap-2 w-full btn-ghost font-medium"><span class="material-icons text-lg">arrow_back</span>Voltar às Categorias</a>' +
+    (isDefaultArmarioView ? '' : '<a href="#medicacao" class="flex items-center justify-center gap-2 w-full btn-ghost font-medium"><span class="material-icons text-lg">arrow_back</span>Voltar às Categorias</a>') +
     '<input type="search" placeholder="Pesquisar nome ou fabricante..." class="w-full px-4 py-2 rounded-xl border border-gray-200" id="armario-search" aria-describedby="armario-help" value="' + escapeHtml(params.q || '') + '" />' +
     '<p class="text-sm text-on-surface-variant" id="armario-help">Pesquisa pelo nome ou fabricante e usa o filtro para reduzir a lista.</p>' +
     '<h3 class="font-bold text-black">Os Meus Medicamentos</h3>' +
