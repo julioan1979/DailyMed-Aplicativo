@@ -983,6 +983,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   border-bottom: 1px solid rgba(17, 24, 39, 0.06);
 }
 
+/* Never show header back arrow on root Armário screens */
+body[data-route="medicacao"] .subpage-header [aria-label="Voltar"],
+body[data-route="medicacao-categorias"] .subpage-header [aria-label="Voltar"] {
+  display: none !important;
+}
+
 /* Modal detail header */
 .modal-med-header {
   background: linear-gradient(135deg, rgba(148,130,189,0.95), rgba(130,183,213,0.9));
