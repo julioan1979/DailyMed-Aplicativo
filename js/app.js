@@ -1252,6 +1252,16 @@ function goToBackFallback(fallback) {
   }
 }
 
+function isMainRootRoute(route) {
+  var roots = ['home', 'medicacao', 'lembretes', 'reciclagem', 'dicas'];
+  return roots.indexOf(route || '') >= 0;
+}
+
+function getRouteFromFallback(fallback) {
+  if (!fallback) return '';
+  return (fallback.charAt(0) === '#' ? fallback.slice(1) : fallback).split('?')[0] || '';
+}
+
 function runRoute() {
   const parsed = parseHash();
   const pathNorm = parsed.path || 'home';
@@ -1273,6 +1283,14 @@ function afterRender(path, params) {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       var fallback = btn.dataset.back || '#home';
+      var fallbackRoute = getRouteFromFallback(fallback);
+      var shouldUseDirectFallback = isMainRootRoute(path) || isMainRootRoute(fallbackRoute);
+
+      if (shouldUseDirectFallback) {
+        goToBackFallback(fallback);
+        return;
+      }
+
       var currentHash = window.location.hash;
       if (window.history && history.length > 1) {
         history.back();
