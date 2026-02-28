@@ -1289,6 +1289,12 @@ function afterRender(path, params) {
   setupFab();
   if (path === 'reciclagem-pontos') initRecyclingMap();
 
+  if (path === 'medicacao' || path === 'medicacao-categorias') {
+    document.querySelectorAll('.subpage-header .back-btn, .subpage-header a[aria-label="Voltar"]').forEach(function (el) {
+      el.remove();
+    });
+  }
+
   document.querySelectorAll('.back-btn').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
