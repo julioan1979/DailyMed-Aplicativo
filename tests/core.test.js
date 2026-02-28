@@ -24,10 +24,10 @@ describe('core utilities', () => {
   it('detectInteractions finds known combinations', () => {
     const meds = [
       { name: 'Sildenafil', substance: '' },
-      { name: 'Brufen', substance: 'ibuprofeno' }
+      { name: 'Nitroglicerina', substance: 'nitroglicerina' }
     ];
     const known = [
-      { id: 'sildenafil-brufen', drug1: ['sildenafil'], drug2: ['brufen', 'ibuprofeno'] }
+      { id: 'sildenafil-brufen', drug1: ['sildenafil'], drug2: ['nitroglicerina'] }
     ];
     const found = core.detectInteractions(meds, known);
     expect(found.length).toBe(1);
