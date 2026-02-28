@@ -89,8 +89,8 @@ function searchInfomed(query, limit) {
 
 var KNOWN_INTERACTIONS = [
   { id: 'sildenafil-brufen', severity: 'grave', color: '#D32F2F', drug1: ['sildenafil'], drug2: ['nitroglicerina'], combination: 'Sildenafil + Nitroglicerina', mechanism: 'A associação de nitroglicerina (antianginoso) e sildenafil (disfunção erétil) pode aumentar o risco de hipotensão grave (efeito aditivo). Não devem ser coadministrados.' },
-  { id: 'lisinopril-brufen', severity: 'moderada', color: '#2E7D32', drug1: ['lisinopril'], drug2: ['brufen', 'ibuprofeno'], combination: 'Lisinopril + Brufen/Ibuprofeno', mechanism: 'O uso crónico de ibuprofeno pode reduzir o efeito antihipertensor e hemodinâmico favorável do lisinopril por inibição das prostaglandinas vasodilatadoras. Aumento do risco de hipercaliemia.' },
-  { id: 'xarelto-brufen', severity: 'ligeira', color: '#F9A825', drug1: ['xarelto', 'rivaroxabano'], drug2: ['brufen', 'ibuprofeno'], combination: 'Xarelto/Rivaroxabano + Brufen/Ibuprofeno', mechanism: 'O ibuprofeno (AINE) pode induzir erosão gástrica e inibição plaquetária. A associação com rivaroxabano (anticoagulante) aumenta o risco de hemorragias.' }
+  { id: 'xarelto-brufen', severity: 'moderada', color: '#2E7D32', drug1: ['xarelto', 'rivaroxabano'], drug2: ['brufen', 'ibuprofeno'], combination: 'Xarelto/Rivaroxabano + Brufen/Ibuprofeno', mechanism: 'O ibuprofeno (AINE) pode induzir erosão gástrica e inibição plaquetária. A associação com rivaroxabano (anticoagulante) aumenta o risco de hemorragias.' },
+  { id: 'lisinopril-brufen', severity: 'ligeira', color: '#F9A825', drug1: ['lisinopril'], drug2: ['brufen', 'ibuprofeno'], combination: 'Lisinopril + Brufen/Ibuprofeno', mechanism: 'O uso crónico de ibuprofeno pode reduzir o efeito antihipertensor e hemodinâmico favorável do lisinopril por inibição das prostaglandinas vasodilatadoras. Aumento do risco de hipercaliemia.' }
 ];
 
 function detectInteractions(medications) {
