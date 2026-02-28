@@ -1243,6 +1243,15 @@ function pageHeader(title, backHref) {
     (title ? '<div class="subpage-title-wrap px-4 pb-4 bg-white"><h2 class="page-title text-black text-center">' + safeTitle + '</h2></div>' : '');
 }
 
+function goToBackFallback(fallback) {
+  if (!fallback) return;
+  if (fallback.charAt(0) === '#') {
+    window.location.hash = fallback;
+  } else {
+    navigate(fallback);
+  }
+}
+
 function runRoute() {
   const parsed = parseHash();
   const pathNorm = parsed.path || 'home';
@@ -1264,17 +1273,17 @@ function afterRender(path, params) {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       var fallback = btn.dataset.back || '#home';
+      var currentHash = window.location.hash;
       if (window.history && history.length > 1) {
         history.back();
+        window.setTimeout(function () {
+          if (window.location.hash === currentHash) {
+            goToBackFallback(fallback);
+          }
+        }, 120);
         return;
       }
-      if (fallback) {
-        if (fallback.charAt(0) === '#') {
-          window.location.hash = fallback;
-        } else {
-          navigate(fallback);
-        }
-      }
+      goToBackFallback(fallback);
     });
   });
 
