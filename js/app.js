@@ -1236,7 +1236,10 @@ const ROUTES = {
 };
 
 function pageHeader(title, backHref) {
-  var back = backHref ? '<button type="button" class="back-btn absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 p-1 rounded-full hover:bg-gray-100" data-back="' + backHref + '" aria-label="Voltar"><span class="material-icons">arrow_back</span></button>' : '';
+  var route = parseHash().path || 'home';
+  var isMedicacaoRoot = route === 'medicacao' || route === 'medicacao-categorias';
+  var shouldRenderBack = !!backHref && !isMedicacaoRoot;
+  var back = shouldRenderBack ? '<button type="button" class="back-btn absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 p-1 rounded-full hover:bg-gray-100" data-back="' + backHref + '" aria-label="Voltar"><span class="material-icons">arrow_back</span></button>' : '';
   var safeTitle = title ? escapeHtml(title) : '';
   return '<header class="subpage-header relative px-4 flex items-center justify-center bg-white">' + back +
     '<img src="logo.png" alt="DailyMed" class="app-logo object-contain" />' +
