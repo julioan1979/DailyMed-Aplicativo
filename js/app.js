@@ -591,6 +591,7 @@ function viewMedicacaoCategorias() {
     if (c === 'Medicação Diária') return;
     list += '<a href="#medicacao-armario?cat=' + encodeURIComponent(c) + '" class="block w-full py-3 px-4 rounded-xl bg-primary-container text-black font-medium text-center shadow-sm">' + c + '</a>';
   });
+  // Sem fallback para ocultar a seta de voltar no ecrã principal do Armário.
   return pageHeader('Armário de Medicamentos', null) +
     '<main class="app-main space-y-3 bg-white">' +
     '<button type="button" id="btn-adicionar-medicamento" class="flex items-center gap-3 w-full py-3 px-4 rounded-xl btn-primary font-medium"><span class="material-icons">add_circle_outline</span><span>Adicionar Medicamento</span></button>' +
